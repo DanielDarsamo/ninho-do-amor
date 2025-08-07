@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { ProgressSteps } from '@/components/ui/progress-steps';
 import { CoupleForm } from '@/components/wedding/couple-form';
 import { InvitationPreview } from '@/components/wedding/invitation-preview';
-import { CasalData } from '@/types/wedding';
+import { DesignCustomizer } from '@/components/wedding/design-customizer';
+import { CasalData, ConviteDesign } from '@/types/wedding';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -11,11 +12,24 @@ const Create = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [casalData, setCasalData] = useState<Partial<CasalData>>({});
+  const [designData, setDesignData] = useState<Partial<ConviteDesign>>({
+    corPrimaria: 'hsl(142, 35%, 45%)',
+    corSecundaria: 'hsl(30, 54%, 98%)',
+    corTexto: 'hsl(160, 25%, 15%)',
+    fundoOpacidade: 20,
+    rsvpHabilitado: true,
+    estiloTexto: 'classico',
+    elementos: []
+  });
 
   const steps = ['Dados Básicos', 'Personalização', 'Finalização'];
 
   const handleDataChange = (newData: Partial<CasalData>) => {
     setCasalData(prev => ({ ...prev, ...newData }));
+  };
+
+  const handleDesignChange = (newDesign: Partial<ConviteDesign>) => {
+    setDesignData(prev => ({ ...prev, ...newDesign }));
   };
 
   const handleNext = () => {
@@ -70,20 +84,13 @@ const Create = () => {
             )}
             
             {currentStep === 1 && (
-              <div className="bg-card rounded-lg p-6 shadow-elegant">
-                <h2 className="text-xl font-heading text-primary mb-4">Personalização</h2>
-                <p className="text-muted-foreground">
-                  Em breve: Personalização de cores, elementos decorativos e música de fundo.
-                </p>
-                <div className="mt-6 space-x-4">
-                  <Button variant="outline" onClick={handleBack}>
-                    Voltar
-                  </Button>
-                  <Button onClick={handleNext} className="bg-gradient-primary">
-                    Próximo
-                  </Button>
-                </div>
-              </div>
+              <DesignCustomizer
+                casal={casalData}
+                design={designData}
+                onDesignChange={handleDesignChange}
+                onNext={handleNext}
+                onBack={handleBack}
+              />
             )}
             
             {currentStep === 2 && (
@@ -112,7 +119,7 @@ const Create = () => {
                 Veja como seu convite ficará
               </p>
             </div>
-            <InvitationPreview casal={casalData} />
+            <InvitationPreview casal={casalData} design={designData} />
           </div>
         </div>
       </div>
