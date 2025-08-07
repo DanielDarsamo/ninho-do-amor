@@ -137,23 +137,28 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
                   <div
                     key={palette.name}
                     onClick={() => handleColorPaletteSelect(palette)}
-                    className="cursor-pointer p-3 rounded-lg border border-border hover:border-primary transition-all"
+                    className={cn(
+                      "cursor-pointer p-3 rounded-lg border transition-all hover:shadow-md",
+                      design.corPrimaria === palette.primary 
+                        ? "border-primary bg-primary/5" 
+                        : "border-border hover:border-primary/50"
+                    )}
                   >
                     <div className="flex items-center space-x-2 mb-2">
                       <div
-                        className="w-4 h-4 rounded-full"
+                        className="w-5 h-5 rounded-full border border-border"
                         style={{ backgroundColor: palette.primary }}
                       />
                       <div
-                        className="w-4 h-4 rounded-full"
+                        className="w-5 h-5 rounded-full border border-border"
                         style={{ backgroundColor: palette.secondary }}
                       />
                       <div
-                        className="w-4 h-4 rounded-full"
+                        className="w-5 h-5 rounded-full border border-border"
                         style={{ backgroundColor: palette.text }}
                       />
                     </div>
-                    <p className="text-xs text-muted-foreground">{palette.name}</p>
+                    <p className="text-xs font-medium">{palette.name}</p>
                   </div>
                 ))}
               </div>
@@ -165,47 +170,74 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
               <div className="space-y-3">
                 <div className="flex items-center space-x-3">
                   <Label className="w-24 text-xs">Primária:</Label>
-                  <Input
-                    type="color"
-                    value={design.corPrimaria || '#6B8E5A'}
-                    onChange={(e) => handleCustomColorChange('corPrimaria', e.target.value)}
-                    className="w-16 h-8 p-1 border-0"
-                  />
-                  <Input
-                    value={design.corPrimaria || '#6B8E5A'}
-                    onChange={(e) => handleCustomColorChange('corPrimaria', e.target.value)}
-                    className="flex-1 text-xs"
-                  />
+                  <div className="flex items-center space-x-2 flex-1">
+                    <div
+                      className="w-8 h-8 rounded border border-border cursor-pointer"
+                      style={{ backgroundColor: design.corPrimaria || 'hsl(142, 35%, 45%)' }}
+                      onClick={() => document.getElementById('primary-color')?.click()}
+                    />
+                    <Input
+                      id="primary-color"
+                      type="color"
+                      value={design.corPrimaria?.includes('hsl') ? '#6B8E5A' : design.corPrimaria || '#6B8E5A'}
+                      onChange={(e) => handleCustomColorChange('corPrimaria', e.target.value)}
+                      className="sr-only"
+                    />
+                    <Input
+                      value={design.corPrimaria || 'hsl(142, 35%, 45%)'}
+                      onChange={(e) => handleCustomColorChange('corPrimaria', e.target.value)}
+                      className="flex-1 text-xs"
+                      placeholder="hsl(142, 35%, 45%)"
+                    />
+                  </div>
                 </div>
 
                 <div className="flex items-center space-x-3">
                   <Label className="w-24 text-xs">Secundária:</Label>
-                  <Input
-                    type="color"
-                    value={design.corSecundaria || '#FDF8F2'}
-                    onChange={(e) => handleCustomColorChange('corSecundaria', e.target.value)}
-                    className="w-16 h-8 p-1 border-0"
-                  />
-                  <Input
-                    value={design.corSecundaria || '#FDF8F2'}
-                    onChange={(e) => handleCustomColorChange('corSecundaria', e.target.value)}
-                    className="flex-1 text-xs"
-                  />
+                  <div className="flex items-center space-x-2 flex-1">
+                    <div
+                      className="w-8 h-8 rounded border border-border cursor-pointer"
+                      style={{ backgroundColor: design.corSecundaria || 'hsl(30, 54%, 98%)' }}
+                      onClick={() => document.getElementById('secondary-color')?.click()}
+                    />
+                    <Input
+                      id="secondary-color"
+                      type="color"
+                      value={design.corSecundaria?.includes('hsl') ? '#FDF8F2' : design.corSecundaria || '#FDF8F2'}
+                      onChange={(e) => handleCustomColorChange('corSecundaria', e.target.value)}
+                      className="sr-only"
+                    />
+                    <Input
+                      value={design.corSecundaria || 'hsl(30, 54%, 98%)'}
+                      onChange={(e) => handleCustomColorChange('corSecundaria', e.target.value)}
+                      className="flex-1 text-xs"
+                      placeholder="hsl(30, 54%, 98%)"
+                    />
+                  </div>
                 </div>
 
                 <div className="flex items-center space-x-3">
                   <Label className="w-24 text-xs">Texto:</Label>
-                  <Input
-                    type="color"
-                    value={design.corTexto || '#2D5A3D'}
-                    onChange={(e) => handleCustomColorChange('corTexto', e.target.value)}
-                    className="w-16 h-8 p-1 border-0"
-                  />
-                  <Input
-                    value={design.corTexto || '#2D5A3D'}
-                    onChange={(e) => handleCustomColorChange('corTexto', e.target.value)}
-                    className="flex-1 text-xs"
-                  />
+                  <div className="flex items-center space-x-2 flex-1">
+                    <div
+                      className="w-8 h-8 rounded border border-border cursor-pointer"
+                      style={{ backgroundColor: design.corTexto || 'hsl(160, 25%, 15%)' }}
+                      onClick={() => document.getElementById('text-color')?.click()}
+                    />
+                    <Input
+                      id="text-color"
+                      type="color"
+                      value={design.corTexto?.includes('hsl') ? '#2D5A3D' : design.corTexto || '#2D5A3D'}
+                      onChange={(e) => handleCustomColorChange('corTexto', e.target.value)}
+                      className="sr-only"
+                    />
+                    <Input
+                      value={design.corTexto || 'hsl(160, 25%, 15%)'}
+                      onChange={(e) => handleCustomColorChange('corTexto', e.target.value)}
+                      className="flex-1 text-xs"
+                      placeholder="hsl(160, 25%, 15%)"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
