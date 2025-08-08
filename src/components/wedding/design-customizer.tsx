@@ -14,6 +14,8 @@ import { cn } from '@/lib/utils';
 interface DesignCustomizerProps {
   casal: Partial<CasalData>;
   design: Partial<ConviteDesign>;
+  selected?: { kind: 'element'; index: number } | { kind: 'titulo' } | { kind: 'mensagem' } | null;
+  onSelect?: (sel: { kind: 'element'; index: number } | { kind: 'titulo' } | { kind: 'mensagem' }) => void;
   onDesignChange: (design: Partial<ConviteDesign>) => void;
   onNext: () => void;
   onBack: () => void;
@@ -37,6 +39,8 @@ const decorativeElements = [
 export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
   casal,
   design,
+  selected,
+  onSelect,
   onDesignChange,
   onNext,
   onBack
