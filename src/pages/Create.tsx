@@ -19,8 +19,19 @@ const Create = () => {
     fundoOpacidade: 20,
     rsvpHabilitado: true,
     estiloTexto: 'classico',
-    elementos: []
+    elementos: [],
+    // Novos padrões
+    tituloConviteTexto: 'CONVITE DE CASAMENTO',
+    tituloConviteCor: 'hsl(142, 35%, 45%)',
+    mensagemPersonalizada: '',
+    mensagemCor: 'hsl(160, 25%, 15%)',
+    fonteTitulo: "Playfair Display, serif",
+    fonteCorpo: "Inter, sans-serif"
   });
+
+  const [selected, setSelected] = useState<
+    { kind: 'element'; index: number } | { kind: 'titulo' } | { kind: 'mensagem' } | null
+  >(null);
 
   const steps = ['Dados Básicos', 'Personalização', 'Finalização'];
 
@@ -87,6 +98,8 @@ const Create = () => {
               <DesignCustomizer
                 casal={casalData}
                 design={designData}
+                selected={selected}
+                onSelect={setSelected}
                 onDesignChange={handleDesignChange}
                 onNext={handleNext}
                 onBack={handleBack}
@@ -119,7 +132,7 @@ const Create = () => {
                 Veja como seu convite ficará
               </p>
             </div>
-            <InvitationPreview casal={casalData} design={designData} />
+            <InvitationPreview casal={casalData} design={designData} selected={selected} onSelect={setSelected} />
           </div>
         </div>
       </div>

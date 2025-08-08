@@ -23,6 +23,14 @@ export interface ConviteDesign {
   rsvpHabilitado: boolean;
   estiloTexto: 'classico' | 'moderno' | 'romantico';
   elementos: ElementoDesign[];
+  // Novos campos para edição avançada
+  tituloConviteTexto?: string;
+  tituloConviteCor?: string;
+  tituloConviteRotacao?: number;
+  mensagemPersonalizada?: string;
+  mensagemCor?: string;
+  fonteTitulo?: string; // CSS font-family para títulos
+  fonteCorpo?: string;  // CSS font-family para corpo
 }
 
 export interface ElementoDesign {
