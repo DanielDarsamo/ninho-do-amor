@@ -43,6 +43,14 @@ export interface ConviteDesign {
   elementos: ElementoDesign[];
   elementosTexto: ElementoTexto[];
   mensagemPersonalizada?: string;
+  // Novos campos para edição avançada
+  tituloConviteTexto?: string;
+  tituloConviteCor?: string;
+  tituloConviteRotacao?: number;
+  mensagemPersonalizada?: string;
+  mensagemCor?: string;
+  fonteTitulo?: string; // CSS font-family para títulos
+  fonteCorpo?: string;  // CSS font-family para corpo
 }
 
 export interface ElementoDesign {

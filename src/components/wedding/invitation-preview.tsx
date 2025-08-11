@@ -14,6 +14,9 @@ interface InvitationPreviewProps {
   casal: Partial<CasalData>;
   design?: Partial<ConviteDesign>;
   className?: string;
+  selected?: { kind: 'element'; index: number } | { kind: 'titulo' } | { kind: 'mensagem' } | null;
+  onSelect?: (sel: { kind: 'element'; index: number } | { kind: 'titulo' } | { kind: 'mensagem' }) => void;
+}
   onDesignChange?: (design: Partial<ConviteDesign>) => void;
   editMode?: boolean;
 }
@@ -41,6 +44,9 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
   casal, 
   design = {},
   className,
+  selected,
+  onSelect
+  className,
   onDesignChange,
   editMode = false
 }) => {
@@ -64,6 +70,15 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
     fundoOpacidade = 20,
     fundoImagem,
     elementos = [],
+    musicaUrl,
+    tituloConviteTexto = 'CONVITE DE CASAMENTO',
+    tituloConviteCor = 'hsl(142, 35%, 45%)',
+    tituloConviteRotacao = 0,
+    mensagemPersonalizada,
+    mensagemCor = 'hsl(160, 25%, 15%)',
+    fonteTitulo,
+    fonteCorpo
+  } = design as Partial<ConviteDesign>;
     elementosTexto = [],
     musicaUrl,
     mensagemPersonalizada = 'O amor é a ponte entre duas almas'

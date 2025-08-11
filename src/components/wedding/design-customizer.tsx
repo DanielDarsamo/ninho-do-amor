@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,6 +17,8 @@ import { InvitationPreview } from './invitation-preview';
 interface DesignCustomizerProps {
   casal: Partial<CasalData>;
   design: Partial<ConviteDesign>;
+  selected?: { kind: 'element'; index: number } | { kind: 'titulo' } | { kind: 'mensagem' } | null;
+  onSelect?: (sel: { kind: 'element'; index: number } | { kind: 'titulo' } | { kind: 'mensagem' }) => void;
   onDesignChange: (design: Partial<ConviteDesign>) => void;
   onNext: () => void;
   onBack: () => void;
@@ -105,6 +109,8 @@ const defaultTextElements: ElementoTexto[] = [
 export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
   casal,
   design,
+  selected,
+  onSelect,
   onDesignChange,
   onNext,
   onBack
