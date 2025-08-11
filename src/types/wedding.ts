@@ -47,7 +47,6 @@ export interface ConviteDesign {
   tituloConviteTexto?: string;
   tituloConviteCor?: string;
   tituloConviteRotacao?: number;
-  mensagemPersonalizada?: string;
   mensagemCor?: string;
   fonteTitulo?: string; // CSS font-family para títulos
   fonteCorpo?: string;  // CSS font-family para corpo

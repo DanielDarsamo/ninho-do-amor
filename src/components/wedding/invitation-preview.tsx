@@ -16,7 +16,6 @@ interface InvitationPreviewProps {
   className?: string;
   selected?: { kind: 'element'; index: number } | { kind: 'titulo' } | { kind: 'mensagem' } | null;
   onSelect?: (sel: { kind: 'element'; index: number } | { kind: 'titulo' } | { kind: 'mensagem' }) => void;
-}
   onDesignChange?: (design: Partial<ConviteDesign>) => void;
   editMode?: boolean;
 }
@@ -40,15 +39,14 @@ const fontStyles = [
   { value: 'italic', label: 'Italic' }
 ];
 
-export const InvitationPreview: React.FC<InvitationPreviewProps> = ({ 
-  casal, 
+export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
+  casal,
   design = {},
   className,
   selected,
-  onSelect
-  className,
+  onSelect,
   onDesignChange,
-  editMode = false
+  editMode = false,
 }) => {
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
   const [editingText, setEditingText] = useState<string | null>(null);
@@ -70,19 +68,16 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
     fundoOpacidade = 20,
     fundoImagem,
     elementos = [],
+    elementosTexto = [],
     musicaUrl,
     tituloConviteTexto = 'CONVITE DE CASAMENTO',
     tituloConviteCor = 'hsl(142, 35%, 45%)',
     tituloConviteRotacao = 0,
-    mensagemPersonalizada,
+    mensagemPersonalizada = 'O amor é a ponte entre duas almas',
     mensagemCor = 'hsl(160, 25%, 15%)',
     fonteTitulo,
-    fonteCorpo
+    fonteCorpo,
   } = design as Partial<ConviteDesign>;
-    elementosTexto = [],
-    musicaUrl,
-    mensagemPersonalizada = 'O amor é a ponte entre duas almas'
-  } = design;
 
   const formatDate = (date?: Date) => {
     if (!date) return 'Data do Casamento';

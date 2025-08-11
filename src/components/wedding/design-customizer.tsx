@@ -7,8 +7,6 @@ import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { CasalData, ConviteDesign, ElementoDesign, ElementoTexto, FonteTexto } from '@/types/wedding';
 import { Heart, Flower, Music, Upload, Palette, Sparkles, Edit3, Type, Plus, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
