@@ -19,7 +19,8 @@ const Create = () => {
     fundoOpacidade: 20,
     rsvpHabilitado: true,
     estiloTexto: 'classico',
-    elementos: []
+    elementos: [],
+    elementosTexto: []
   });
 
   const steps = ['Dados Básicos', 'Personalização', 'Finalização'];
@@ -72,34 +73,75 @@ const Create = () => {
         </div>
 
         {/* Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-          {/* Form */}
-          <div>
-            {currentStep === 0 && (
-              <CoupleForm
-                data={casalData}
-                onDataChange={handleDataChange}
-                onNext={handleNext}
-              />
-            )}
-            
-            {currentStep === 1 && (
-              <DesignCustomizer
-                casal={casalData}
-                design={designData}
-                onDesignChange={handleDesignChange}
-                onNext={handleNext}
-                onBack={handleBack}
-              />
-            )}
-            
-            {currentStep === 2 && (
+        <div className="max-w-7xl mx-auto">
+          {currentStep === 0 && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+              {/* Form */}
+              <div>
+                <CoupleForm
+                  data={casalData}
+                  onDataChange={handleDataChange}
+                  onNext={handleNext}
+                />
+              </div>
+
+              {/* Preview */}
+              <div className="lg:sticky lg:top-8">
+                <div className="text-center mb-4">
+                  <h3 className="text-lg font-medium text-muted-foreground">Pré-visualização</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Veja como seu convite ficará
+                  </p>
+                </div>
+                <InvitationPreview casal={casalData} design={designData} />
+              </div>
+            </div>
+          )}
+          
+          {currentStep === 1 && (
+            <DesignCustomizer
+              casal={casalData}
+              design={designData}
+              onDesignChange={handleDesignChange}
+              onNext={handleNext}
+              onBack={handleBack}
+            />
+          )}
+          
+          {currentStep === 2 && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               <div className="bg-card rounded-lg p-6 shadow-elegant">
                 <h2 className="text-xl font-heading text-primary mb-4">Finalização</h2>
-                <p className="text-muted-foreground">
-                  Em breve: Geração do link final e opções de compartilhamento.
+                <p className="text-muted-foreground mb-4">
+                  Revise os detalhes do seu convite antes de criar o link final.
                 </p>
-                <div className="mt-6 space-x-4">
+                
+                <div className="space-y-4 mb-6">
+                  <div>
+                    <h3 className="font-medium mb-2">Casal</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {casalData.primeiroNome} {casalData.sobrenome} & {casalData.parceiroPrimeiroNome} {casalData.parceiroSobrenome}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h3 className="font-medium mb-2">Data e Local</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {casalData.dataCasamento?.toLocaleDateString('pt-MZ')} em {casalData.cidade}, {casalData.provincia}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h3 className="font-medium mb-2">Design</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Cores: {designData.corPrimaria ? 'Personalizadas' : 'Padrão'} | 
+                      Elementos: {designData.elementos?.length || 0} | 
+                      Textos: {designData.elementosTexto?.length || 0}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="space-x-4">
                   <Button variant="outline" onClick={handleBack}>
                     Voltar
                   </Button>
@@ -108,19 +150,19 @@ const Create = () => {
                   </Button>
                 </div>
               </div>
-            )}
-          </div>
 
-          {/* Preview */}
-          <div className="lg:sticky lg:top-8">
-            <div className="text-center mb-4">
-              <h3 className="text-lg font-medium text-muted-foreground">Pré-visualização</h3>
-              <p className="text-sm text-muted-foreground">
-                Veja como seu convite ficará
-              </p>
+              {/* Final Preview */}
+              <div className="lg:sticky lg:top-8">
+                <div className="text-center mb-4">
+                  <h3 className="text-lg font-medium text-muted-foreground">Convite Final</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Versão final do seu convite
+                  </p>
+                </div>
+                <InvitationPreview casal={casalData} design={designData} />
+              </div>
             </div>
-            <InvitationPreview casal={casalData} design={designData} />
-          </div>
+          )}
         </div>
       </div>
     </div>

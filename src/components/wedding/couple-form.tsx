@@ -67,7 +67,7 @@ export const CoupleForm: React.FC<CoupleFormProps> = ({ onDataChange, onNext, da
                   id="primeiroNome"
                   value={data.primeiroNome || ''}
                   onChange={(e) => handleInputChange('primeiroNome', e.target.value)}
-                  placeholder="Daniel"
+                  placeholder="João"
                   className="mt-1"
                 />
               </div>
@@ -77,7 +77,7 @@ export const CoupleForm: React.FC<CoupleFormProps> = ({ onDataChange, onNext, da
                   id="sobrenome"
                   value={data.sobrenome || ''}
                   onChange={(e) => handleInputChange('sobrenome', e.target.value)}
-                  placeholder="Darsamo"
+                  placeholder="Silva"
                   className="mt-1"
                 />
               </div>
@@ -95,7 +95,7 @@ export const CoupleForm: React.FC<CoupleFormProps> = ({ onDataChange, onNext, da
                   id="parceiroPrimeiroNome"
                   value={data.parceiroPrimeiroNome || ''}
                   onChange={(e) => handleInputChange('parceiroPrimeiroNome', e.target.value)}
-                  placeholder="Lorna"
+                  placeholder="Maria"
                   className="mt-1"
                 />
               </div>
@@ -105,7 +105,7 @@ export const CoupleForm: React.FC<CoupleFormProps> = ({ onDataChange, onNext, da
                   id="parceiroSobrenome"
                   value={data.parceiroSobrenome || ''}
                   onChange={(e) => handleInputChange('parceiroSobrenome', e.target.value)}
-                  placeholder="Peixoto"
+                  placeholder="Pereira"
                   className="mt-1"
                 />
               </div>

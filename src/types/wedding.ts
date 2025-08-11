@@ -11,6 +11,24 @@ export interface CasalData {
   email?: string;
 }
 
+export interface FonteTexto {
+  familia: string;
+  tamanho: number;
+  peso: 'normal' | 'bold' | 'light';
+  estilo: 'normal' | 'italic';
+  cor: string;
+}
+
+export interface ElementoTexto {
+  id: string;
+  tipo: 'titulo' | 'subtitulo' | 'mensagem' | 'detalhes' | 'personalizado';
+  texto: string;
+  posicao: { x: number; y: number };
+  fonte: FonteTexto;
+  editavel: boolean;
+  visivel: boolean;
+}
+
 export interface ConviteDesign {
   id?: string;
   casalId?: string;
@@ -23,15 +41,20 @@ export interface ConviteDesign {
   rsvpHabilitado: boolean;
   estiloTexto: 'classico' | 'moderno' | 'romantico';
   elementos: ElementoDesign[];
+  elementosTexto: ElementoTexto[];
+  mensagemPersonalizada?: string;
 }
 
 export interface ElementoDesign {
+  id: string;
   tipo: 'coracao' | 'flor' | 'anel' | 'texto' | 'monograma';
   posicao: { x: number; y: number };
   tamanho: number;
   cor: string;
   rotacao?: number;
   texto?: string;
+  editavel: boolean;
+  visivel: boolean;
 }
 
 export interface RSVP {
