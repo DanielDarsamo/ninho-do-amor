@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { CasalData, ConviteDesign, ElementoDesign, ElementoTexto, FonteTexto } from '@/types/wedding';
+import { CasalData, ConviteDesign, ElementoDesign, ElementoTexto, FonteTexto, CanvasSettings } from '@/types/wedding';
 import { Heart, Calendar, MapPin, Flower, Sparkles, Edit3, X, RotateCw, Palette, Type, Move } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -258,7 +258,15 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
   };
 
   const getCanvasStyle = () => {
-    const settings = canvasSettings || {};
+    const settings: CanvasSettings = canvasSettings || {
+      aspectRatio: 'portrait',
+      width: 400,
+      height: 500,
+      backgroundFit: 'crop',
+      gridEnabled: false,
+      snapToGrid: false,
+      gridSize: 20
+    };
     let width = 400;
     let height = 500;
 
