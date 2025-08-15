@@ -17,16 +17,34 @@ export interface FonteTexto {
   peso: 'normal' | 'bold' | 'light';
   estilo: 'normal' | 'italic';
   cor: string;
+  decoracao?: 'none' | 'underline' | 'line-through';
+  alinhamento?: 'left' | 'center' | 'right' | 'justify';
+  espacamentoLinhas?: number;
+  espacamentoLetras?: number;
 }
 
 export interface ElementoTexto {
   id: string;
-  tipo: 'titulo' | 'subtitulo' | 'mensagem' | 'detalhes' | 'personalizado';
+  tipo: 'titulo' | 'subtitulo' | 'mensagem' | 'detalhes' | 'personalizado' | 'nomes' | 'data' | 'hora' | 'local' | 'rsvp';
   texto: string;
   posicao: { x: number; y: number };
+  tamanho: { width: number; height: number };
   fonte: FonteTexto;
   editavel: boolean;
   visivel: boolean;
+  bloqueado?: boolean;
+  grupoId?: string;
+  zIndex?: number;
+}
+
+export interface CanvasSettings {
+  aspectRatio: 'square' | 'portrait' | 'landscape' | 'custom';
+  width: number;
+  height: number;
+  backgroundFit: 'crop' | 'stretch' | 'tile' | 'fit';
+  gridEnabled: boolean;
+  snapToGrid: boolean;
+  gridSize: number;
 }
 
 export interface ConviteDesign {
@@ -43,13 +61,18 @@ export interface ConviteDesign {
   elementos: ElementoDesign[];
   elementosTexto: ElementoTexto[];
   mensagemPersonalizada?: string;
-  // Novos campos para edição avançada
+  // Canvas settings
+  canvasSettings?: CanvasSettings;
+  // Advanced editing fields
   tituloConviteTexto?: string;
   tituloConviteCor?: string;
   tituloConviteRotacao?: number;
   mensagemCor?: string;
-  fonteTitulo?: string; // CSS font-family para títulos
-  fonteCorpo?: string;  // CSS font-family para corpo
+  fonteTitulo?: string;
+  fonteCorpo?: string;
+  // Background gallery options
+  backgroundGallery?: string[];
+  backgroundIndex?: number;
 }
 
 export interface ElementoDesign {

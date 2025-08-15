@@ -62,6 +62,7 @@ const defaultTextElements: ElementoTexto[] = [
     tipo: 'titulo',
     texto: 'CONVITE DE CASAMENTO',
     posicao: { x: 50, y: 10 },
+    tamanho: { width: 300, height: 50 },
     fonte: {
       familia: 'serif',
       tamanho: 14,
@@ -77,6 +78,7 @@ const defaultTextElements: ElementoTexto[] = [
     tipo: 'titulo',
     texto: 'Seu Nome & Nome do Parceiro',
     posicao: { x: 50, y: 25 },
+    tamanho: { width: 400, height: 60 },
     fonte: {
       familia: 'serif',
       tamanho: 32,
@@ -92,6 +94,7 @@ const defaultTextElements: ElementoTexto[] = [
     tipo: 'mensagem',
     texto: 'O amor é a ponte entre duas almas',
     posicao: { x: 50, y: 70 },
+    tamanho: { width: 350, height: 40 },
     fonte: {
       familia: 'serif',
       tamanho: 14,
@@ -206,6 +209,7 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
       tipo: 'personalizado',
       texto: 'Novo texto',
       posicao: { x: 50, y: 50 },
+      tamanho: { width: 200, height: 50 },
       fonte: {
         familia: 'serif',
         tamanho: 16,
