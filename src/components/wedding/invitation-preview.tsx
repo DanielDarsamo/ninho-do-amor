@@ -9,24 +9,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Slider } from '@/components/ui/slider';
 import { Card, CardContent } from '@/components/ui/card';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { getFontFamily } from '@/data/fonts';
 
 interface InvitationPreviewProps {
   casal: Partial<CasalData>;
   design?: Partial<ConviteDesign>;
   className?: string;
-  selected?: { kind: 'element'; index: number } | { kind: 'titulo' } | { kind: 'mensagem' } | null;
-  onSelect?: (sel: { kind: 'element'; index: number } | { kind: 'titulo' } | { kind: 'mensagem' }) => void;
   onDesignChange?: (design: Partial<ConviteDesign>) => void;
   editMode?: boolean;
 }
-
-const fontFamilies = [
-  { value: 'serif', label: 'Serif', className: 'font-serif' },
-  { value: 'sans', label: 'Sans Serif', className: 'font-sans' },
-  { value: 'mono', label: 'Monospace', className: 'font-mono' },
-  { value: 'cursive', label: 'Cursive', className: 'font-cursive' },
-  { value: 'fantasy', label: 'Fantasy', className: 'font-fantasy' }
-];
 
 const fontWeights = [
   { value: 'light', label: 'Light' },
@@ -39,14 +30,19 @@ const fontStyles = [
   { value: 'italic', label: 'Italic' }
 ];
 
-export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
-  casal,
+const alignments = [
+  { value: 'left', label: 'Esquerda' },
+  { value: 'center', label: 'Centro' },
+  { value: 'right', label: 'Direita' },
+  { value: 'justify', label: 'Justificado' }
+];
+
+export const InvitationPreview: React.FC<InvitationPreviewProps> = ({ 
+  casal, 
   design = {},
   className,
-  selected,
-  onSelect,
   onDesignChange,
-  editMode = false,
+  editMode = false
 }) => {
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
   const [editingText, setEditingText] = useState<string | null>(null);
@@ -70,14 +66,9 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
     elementos = [],
     elementosTexto = [],
     musicaUrl,
-    tituloConviteTexto = 'CONVITE DE CASAMENTO',
-    tituloConviteCor = 'hsl(142, 35%, 45%)',
-    tituloConviteRotacao = 0,
     mensagemPersonalizada = 'O amor é a ponte entre duas almas',
-    mensagemCor = 'hsl(160, 25%, 15%)',
-    fonteTitulo,
-    fonteCorpo,
-  } = design as Partial<ConviteDesign>;
+    canvasSettings
+  } = design;
 
   const formatDate = (date?: Date) => {
     if (!date) return 'Data do Casamento';
@@ -199,11 +190,14 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
     if (!elemento.visivel) return null;
 
     const fontStyle = {
-      fontFamily: elemento.fonte.familia,
+      fontFamily: getFontFamily(elemento.fonte.familia),
       fontSize: `${elemento.fonte.tamanho}px`,
       fontWeight: elemento.fonte.peso,
       fontStyle: elemento.fonte.estilo,
-      color: elemento.fonte.cor
+      color: elemento.fonte.cor,
+      textAlign: elemento.fonte.alinhamento || 'center',
+      width: `${elemento.tamanho.width}px`,
+      height: `${elemento.tamanho.height}px`
     };
 
     return (
@@ -216,6 +210,7 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
         style={{
           left: `${elemento.posicao.x}%`,
           top: `${elemento.posicao.y}%`,
+          transform: 'translate(-50%, -50%)',
           ...fontStyle
         }}
         onClick={() => handleTextClick(elemento.id)}
@@ -227,6 +222,7 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
             onBlur={() => setEditingText(null)}
             autoFocus
             className="min-w-[200px] resize-none"
+            style={{ fontFamily: getFontFamily(elemento.fonte.familia) }}
           />
         ) : (
           <span>{elemento.texto}</span>
@@ -261,18 +257,51 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
     );
   };
 
+  const getCanvasStyle = () => {
+    const settings = canvasSettings || {};
+    let width = 400;
+    let height = 500;
+
+    switch (settings.aspectRatio) {
+      case 'square':
+        width = height = 400;
+        break;
+      case 'portrait':
+        width = 400;
+        height = 500;
+        break;
+      case 'landscape':
+        width = 600;
+        height = 337.5;
+        break;
+      case 'custom':
+        width = settings.width || 400;
+        height = settings.height || 500;
+        break;
+    }
+
+    return {
+      width: `${width}px`,
+      height: `${height}px`,
+      maxWidth: '100%',
+      backgroundColor: corSecundaria,
+      backgroundImage: fundoImagem ? `url(${fundoImagem})` : undefined,
+      backgroundSize: settings.backgroundFit === 'crop' ? 'cover' :
+                     settings.backgroundFit === 'stretch' ? '100% 100%' :
+                     settings.backgroundFit === 'tile' ? 'repeat' :
+                     settings.backgroundFit === 'fit' ? 'contain' : 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: settings.backgroundFit === 'tile' ? 'repeat' : 'no-repeat'
+    };
+  };
+
   return (
     <div className="relative">
       <div className={cn(
-        "relative w-full max-w-md mx-auto rounded-lg shadow-invitation overflow-hidden",
+        "relative mx-auto rounded-lg shadow-invitation overflow-hidden",
         className
       )}
-      style={{
-        backgroundColor: corSecundaria,
-        backgroundImage: fundoImagem ? `url(${fundoImagem})` : undefined,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center'
-      }}
+      style={getCanvasStyle()}
       >
         {/* Background Overlay */}
         {fundoImagem && (
@@ -285,13 +314,15 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
           />
         )}
 
-        {/* Background Pattern */}
-        <div 
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23${corPrimaria.replace('#', '')}' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-          }}
-        />
+        {/* Grid Pattern */}
+        {canvasSettings?.gridEnabled && (
+          <div 
+            className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='${canvasSettings.gridSize}' height='${canvasSettings.gridSize}' viewBox='0 0 ${canvasSettings.gridSize} ${canvasSettings.gridSize}' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23${corPrimaria.replace('#', '')}' fill-opacity='0.1'%3E%3Cpath d='M0 0h1v1H0z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+            }}
+          />
+        )}
 
         {/* Decorative Elements */}
         {elementos.filter(el => el.visivel).map((elemento, index) => renderDecorativeElement(elemento, index))}

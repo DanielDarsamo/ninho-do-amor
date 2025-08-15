@@ -1,22 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CasalData, ConviteDesign, ElementoDesign, ElementoTexto, FonteTexto } from '@/types/wedding';
-import { Heart, Flower, Music, Upload, Palette, Sparkles, Edit3, Type, Plus, Trash2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
+import { CasalData, ConviteDesign, ElementoDesign, ElementoTexto, FonteTexto, CanvasSettings } from '@/types/wedding';
+import { Heart, Flower, Music, Upload, Palette, Sparkles, Edit3, Type, Plus, Trash2, Download, Share2, RotateCw, Move, Maximize2, Grid, Lock, Unlock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { InvitationPreview } from './invitation-preview';
+import { fontOptions, getFontFamily, loadGoogleFonts } from '@/data/fonts';
+import { backgroundOptions, getBackgroundsByCategory } from '@/data/backgrounds';
 
 interface DesignCustomizerProps {
   casal: Partial<CasalData>;
   design: Partial<ConviteDesign>;
-  selected?: { kind: 'element'; index: number } | { kind: 'titulo' } | { kind: 'mensagem' } | null;
-  onSelect?: (sel: { kind: 'element'; index: number } | { kind: 'titulo' } | { kind: 'mensagem' }) => void;
   onDesignChange: (design: Partial<ConviteDesign>) => void;
   onNext: () => void;
   onBack: () => void;
@@ -37,23 +38,18 @@ const decorativeElements = [
   { type: 'texto' as const, icon: Sparkles, name: 'Texto Decorativo' }
 ];
 
-const fontFamilies = [
-  { value: 'serif', label: 'Serif' },
-  { value: 'sans', label: 'Sans Serif' },
-  { value: 'mono', label: 'Monospace' },
-  { value: 'cursive', label: 'Cursive' },
-  { value: 'fantasy', label: 'Fantasy' }
+const aspectRatioOptions = [
+  { value: 'square', label: 'Quadrado (1:1)' },
+  { value: 'portrait', label: 'Retrato (4:5)' },
+  { value: 'landscape', label: 'Paisagem (16:9)' },
+  { value: 'custom', label: 'Personalizado' }
 ];
 
-const fontWeights = [
-  { value: 'light', label: 'Light' },
-  { value: 'normal', label: 'Normal' },
-  { value: 'bold', label: 'Bold' }
-];
-
-const fontStyles = [
-  { value: 'normal', label: 'Normal' },
-  { value: 'italic', label: 'Italic' }
+const backgroundFitOptions = [
+  { value: 'crop', label: 'Cortar' },
+  { value: 'stretch', label: 'Esticar' },
+  { value: 'tile', label: 'Repetir' },
+  { value: 'fit', label: 'Ajustar' }
 ];
 
 const defaultTextElements: ElementoTexto[] = [
@@ -64,27 +60,29 @@ const defaultTextElements: ElementoTexto[] = [
     posicao: { x: 50, y: 10 },
     tamanho: { width: 300, height: 50 },
     fonte: {
-      familia: 'serif',
-      tamanho: 14,
+      familia: 'Great Vibes',
+      tamanho: 24,
       peso: 'bold',
       estilo: 'normal',
-      cor: 'hsl(142, 35%, 45%)'
+      cor: 'hsl(142, 35%, 45%)',
+      alinhamento: 'center'
     },
     editavel: true,
     visivel: true
   },
   {
     id: 'names',
-    tipo: 'titulo',
+    tipo: 'nomes',
     texto: 'Seu Nome & Nome do Parceiro',
-    posicao: { x: 50, y: 25 },
-    tamanho: { width: 400, height: 60 },
+    posicao: { x: 50, y: 30 },
+    tamanho: { width: 400, height: 80 },
     fonte: {
-      familia: 'serif',
+      familia: 'Playfair Display',
       tamanho: 32,
       peso: 'bold',
       estilo: 'normal',
-      cor: 'hsl(160, 25%, 15%)'
+      cor: 'hsl(160, 25%, 15%)',
+      alinhamento: 'center'
     },
     editavel: true,
     visivel: true
@@ -93,25 +91,34 @@ const defaultTextElements: ElementoTexto[] = [
     id: 'message',
     tipo: 'mensagem',
     texto: 'O amor é a ponte entre duas almas',
-    posicao: { x: 50, y: 70 },
-    tamanho: { width: 350, height: 40 },
+    posicao: { x: 50, y: 75 },
+    tamanho: { width: 350, height: 60 },
     fonte: {
-      familia: 'serif',
-      tamanho: 14,
+      familia: 'Dancing Script',
+      tamanho: 18,
       peso: 'normal',
       estilo: 'italic',
-      cor: 'hsl(160, 25%, 15%)'
+      cor: 'hsl(160, 25%, 15%)',
+      alinhamento: 'center'
     },
     editavel: true,
     visivel: true
   }
 ];
 
+const defaultCanvasSettings: CanvasSettings = {
+  aspectRatio: 'portrait',
+  width: 400,
+  height: 500,
+  backgroundFit: 'crop',
+  gridEnabled: false,
+  snapToGrid: false,
+  gridSize: 20
+};
+
 export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
   casal,
   design,
-  selected,
-  onSelect,
   onDesignChange,
   onNext,
   onBack
@@ -119,13 +126,20 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
   const [activeTab, setActiveTab] = useState('cores');
   const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
+  const [backgroundCategory, setBackgroundCategory] = useState<string>('all');
 
-  // Initialize default text elements if not present
-  React.useEffect(() => {
+  // Load Google Fonts on component mount
+  useEffect(() => {
+    loadGoogleFonts();
+  }, []);
+
+  // Initialize default elements if not present
+  useEffect(() => {
     if (!design.elementosTexto || design.elementosTexto.length === 0) {
       onDesignChange({
         ...design,
-        elementosTexto: defaultTextElements
+        elementosTexto: defaultTextElements,
+        canvasSettings: defaultCanvasSettings
       });
     }
   }, []);
@@ -169,19 +183,24 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
     }
   };
 
-  const handleMusicUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        onDesignChange({
-          ...design,
-          musicaUrl: result
-        });
-      };
-      reader.readAsDataURL(file);
+  const handleBackgroundSelect = (backgroundId: string) => {
+    const background = backgroundOptions.find(bg => bg.id === backgroundId);
+    if (background) {
+      onDesignChange({
+        ...design,
+        fundoImagem: background.url
+      });
     }
+  };
+
+  const handleCanvasSettingsChange = (settings: Partial<CanvasSettings>) => {
+    onDesignChange({
+      ...design,
+      canvasSettings: {
+        ...design.canvasSettings,
+        ...settings
+      }
+    });
   };
 
   const addDecorativeElement = (type: ElementoDesign['tipo']) => {
@@ -197,6 +216,11 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
     };
 
     const currentElements = design.elementos || [];
+    if (currentElements.length >= 10) {
+      alert('Máximo de 10 elementos decorativos atingido');
+      return;
+    }
+
     onDesignChange({
       ...design,
       elementos: [...currentElements, newElement]
@@ -211,11 +235,12 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
       posicao: { x: 50, y: 50 },
       tamanho: { width: 200, height: 50 },
       fonte: {
-        familia: 'serif',
+        familia: 'Montserrat',
         tamanho: 16,
         peso: 'normal',
         estilo: 'normal',
-        cor: design.corTexto || 'hsl(160, 25%, 15%)'
+        cor: design.corTexto || 'hsl(160, 25%, 15%)',
+        alinhamento: 'center'
       },
       editavel: true,
       visivel: true
@@ -250,20 +275,53 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
     });
   };
 
+  const handleMusicUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        onDesignChange({
+          ...design,
+          musicaUrl: result
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const generateInvitation = async () => {
+    alert('Convite gerado com sucesso! Em breve você receberá o link para compartilhamento.');
+  };
+
+  const filteredBackgrounds = backgroundCategory === 'all' 
+    ? backgroundOptions 
+    : getBackgroundsByCategory(backgroundCategory);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Preview Section */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-medium">Visualização</h3>
-          <Button
-            variant={editMode ? "default" : "outline"}
-            size="sm"
-            onClick={() => setEditMode(!editMode)}
-          >
-            <Edit3 className="w-4 h-4 mr-2" />
-            {editMode ? 'Sair do Modo Edição' : 'Modo Edição'}
-          </Button>
+          <div className="flex space-x-2">
+            <Button
+              variant={editMode ? "default" : "outline"}
+              size="sm"
+              onClick={() => setEditMode(!editMode)}
+            >
+              <Edit3 className="w-4 h-4 mr-2" />
+              {editMode ? 'Sair do Modo Edição' : 'Modo Edição'}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={generateInvitation}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Gerar Convite
+            </Button>
+          </div>
         </div>
         
         <InvitationPreview
@@ -280,16 +338,17 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
         <CardHeader>
           <CardTitle className="text-xl font-heading text-primary flex items-center space-x-2">
             <Palette className="w-5 h-5" />
-            <span>Personalização</span>
+            <span>Personalização Avançada</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="cores">Cores</TabsTrigger>
               <TabsTrigger value="fundo">Fundo</TabsTrigger>
               <TabsTrigger value="textos">Textos</TabsTrigger>
               <TabsTrigger value="elementos">Elementos</TabsTrigger>
+              <TabsTrigger value="canvas">Canvas</TabsTrigger>
               <TabsTrigger value="musica">Música</TabsTrigger>
             </TabsList>
 
@@ -409,7 +468,47 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
 
             <TabsContent value="fundo" className="space-y-6 mt-6">
               <div>
-                <Label className="text-sm font-medium mb-3 block">Imagem de Fundo</Label>
+                <Label className="text-sm font-medium mb-3 block">Galeria de Fundos</Label>
+                <Select value={backgroundCategory} onValueChange={setBackgroundCategory}>
+                  <SelectTrigger className="mb-3">
+                    <SelectValue placeholder="Selecione uma categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas as Categorias</SelectItem>
+                    <SelectItem value="floral">Floral</SelectItem>
+                    <SelectItem value="hearts">Corações</SelectItem>
+                    <SelectItem value="cultural">Cultural</SelectItem>
+                    <SelectItem value="abstract">Abstrato</SelectItem>
+                    <SelectItem value="nature">Natureza</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <div className="grid grid-cols-2 gap-3 max-h-60 overflow-y-auto">
+                  {filteredBackgrounds.map((background) => (
+                    <div
+                      key={background.id}
+                      onClick={() => handleBackgroundSelect(background.id)}
+                      className={cn(
+                        "cursor-pointer p-2 rounded-lg border transition-all hover:shadow-md",
+                        design.fundoImagem === background.url 
+                          ? "border-primary bg-primary/5" 
+                          : "border-border hover:border-primary/50"
+                      )}
+                    >
+                      <img
+                        src={background.thumbnail}
+                        alt={background.name}
+                        className="w-full h-20 object-cover rounded mb-2"
+                      />
+                      <p className="text-xs font-medium">{background.name}</p>
+                      <p className="text-xs text-muted-foreground">{background.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium mb-3 block">Upload de Imagem</Label>
                 <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
                   <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
                   <p className="text-sm text-muted-foreground mb-3">
@@ -458,7 +557,7 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
                 </Button>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-4 max-h-96 overflow-y-auto">
                 {(design.elementosTexto || []).map((elemento) => (
                   <div key={elemento.id} className="border rounded-lg p-4 space-y-3">
                     <div className="flex items-center justify-between">
@@ -492,9 +591,11 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            {fontFamilies.map((font) => (
+                            {fontOptions.map((font) => (
                               <SelectItem key={font.value} value={font.value}>
-                                {font.label}
+                                <span style={{ fontFamily: getFontFamily(font.value) }}>
+                                  {font.label}
+                                </span>
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -502,14 +603,16 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
                       </div>
 
                       <div>
-                        <Label className="text-xs">Tamanho</Label>
-                        <Input
-                          type="number"
-                          value={elemento.fonte.tamanho}
-                          onChange={(e) => updateTextElement(elemento.id, {
-                            fonte: { ...elemento.fonte, tamanho: parseInt(e.target.value) }
+                        <Label className="text-xs">Tamanho: {elemento.fonte.tamanho}px</Label>
+                        <Slider
+                          value={[elemento.fonte.tamanho]}
+                          onValueChange={(value) => updateTextElement(elemento.id, {
+                            fonte: { ...elemento.fonte, tamanho: value[0] }
                           })}
-                          className="text-xs"
+                          min={10}
+                          max={100}
+                          step={1}
+                          className="w-full"
                         />
                       </div>
 
@@ -525,11 +628,9 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            {fontWeights.map((weight) => (
-                              <SelectItem key={weight.value} value={weight.value}>
-                                {weight.label}
-                              </SelectItem>
-                            ))}
+                            <SelectItem value="light">Light</SelectItem>
+                            <SelectItem value="normal">Normal</SelectItem>
+                            <SelectItem value="bold">Bold</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -546,40 +647,57 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            {fontStyles.map((style) => (
-                              <SelectItem key={style.value} value={style.value}>
-                                {style.label}
-                              </SelectItem>
-                            ))}
+                            <SelectItem value="normal">Normal</SelectItem>
+                            <SelectItem value="italic">Italic</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
-                    </div>
 
-                    <div>
-                      <Label className="text-xs">Cor</Label>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <div
-                          className="w-6 h-6 rounded border border-border cursor-pointer"
-                          style={{ backgroundColor: elemento.fonte.cor }}
-                          onClick={() => document.getElementById(`color-${elemento.id}`)?.click()}
-                        />
-                        <Input
-                          id={`color-${elemento.id}`}
-                          type="color"
-                          value={elemento.fonte.cor}
-                          onChange={(e) => updateTextElement(elemento.id, {
-                            fonte: { ...elemento.fonte, cor: e.target.value }
+                      <div>
+                        <Label className="text-xs">Alinhamento</Label>
+                        <Select
+                          value={elemento.fonte.alinhamento || 'center'}
+                          onValueChange={(value) => updateTextElement(elemento.id, {
+                            fonte: { ...elemento.fonte, alinhamento: value as any }
                           })}
-                          className="sr-only"
-                        />
-                        <Input
-                          value={elemento.fonte.cor}
-                          onChange={(e) => updateTextElement(elemento.id, {
-                            fonte: { ...elemento.fonte, cor: e.target.value }
-                          })}
-                          className="flex-1 text-xs"
-                        />
+                        >
+                          <SelectTrigger className="text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="left">Esquerda</SelectItem>
+                            <SelectItem value="center">Centro</SelectItem>
+                            <SelectItem value="right">Direita</SelectItem>
+                            <SelectItem value="justify">Justificado</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <Label className="text-xs">Cor</Label>
+                        <div className="flex items-center space-x-2 mt-1">
+                          <div
+                            className="w-6 h-6 rounded border border-border cursor-pointer"
+                            style={{ backgroundColor: elemento.fonte.cor }}
+                            onClick={() => document.getElementById(`color-${elemento.id}`)?.click()}
+                          />
+                          <Input
+                            id={`color-${elemento.id}`}
+                            type="color"
+                            value={elemento.fonte.cor}
+                            onChange={(e) => updateTextElement(elemento.id, {
+                              fonte: { ...elemento.fonte, cor: e.target.value }
+                            })}
+                            className="sr-only"
+                          />
+                          <Input
+                            value={elemento.fonte.cor}
+                            onChange={(e) => updateTextElement(elemento.id, {
+                              fonte: { ...elemento.fonte, cor: e.target.value }
+                            })}
+                            className="flex-1 text-xs"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -613,24 +731,80 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
                       variant="outline"
                       onClick={() => addDecorativeElement(element.type)}
                       className="h-20 flex-col space-y-2"
+                      disabled={(design.elementos?.length || 0) >= 10}
                     >
                       <element.icon className="w-6 h-6" />
                       <span className="text-xs">{element.name}</span>
                     </Button>
                   ))}
                 </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Máximo de 10 elementos. Clique nos elementos no preview para editá-los.
+                </p>
               </div>
 
               {design.elementos && design.elementos.length > 0 && (
                 <div>
                   <Label className="text-sm font-medium mb-3 block">
-                    Elementos Adicionados: {design.elementos.filter(el => el.visivel).length}
+                    Elementos Adicionados: {design.elementos.filter(el => el.visivel).length}/10
                   </Label>
-                  <p className="text-xs text-muted-foreground">
-                    Clique nos elementos no preview para editá-los individualmente.
-                  </p>
                 </div>
               )}
+            </TabsContent>
+
+            <TabsContent value="canvas" className="space-y-6 mt-6">
+              <div>
+                <Label className="text-sm font-medium mb-3 block">Configurações do Canvas</Label>
+                
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-xs">Proporção</Label>
+                    <Select
+                      value={design.canvasSettings?.aspectRatio || 'portrait'}
+                      onValueChange={(value) => handleCanvasSettingsChange({ aspectRatio: value as any })}
+                    >
+                      <SelectTrigger className="text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {aspectRatioOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs">Ajuste do Fundo</Label>
+                    <Select
+                      value={design.canvasSettings?.backgroundFit || 'crop'}
+                      onValueChange={(value) => handleCanvasSettingsChange({ backgroundFit: value as any })}
+                    >
+                      <SelectTrigger className="text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {backgroundFitOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="grid-enabled"
+                      checked={design.canvasSettings?.gridEnabled || false}
+                      onCheckedChange={(checked) => handleCanvasSettingsChange({ gridEnabled: checked })}
+                    />
+                    <Label htmlFor="grid-enabled" className="text-xs">Mostrar Grade</Label>
+                  </div>
+                </div>
+              </div>
             </TabsContent>
 
             <TabsContent value="musica" className="space-y-6 mt-6">
