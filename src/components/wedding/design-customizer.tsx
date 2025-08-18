@@ -52,59 +52,10 @@ const backgroundFitOptions = [
   { value: 'fit', label: 'Ajustar' }
 ];
 
-const defaultTextElements: ElementoTexto[] = [
-  {
-    id: 'header-title',
-    tipo: 'titulo',
-    texto: 'CONVITE DE CASAMENTO',
-    posicao: { x: 50, y: 10 },
-    tamanho: { width: 300, height: 50 },
-    fonte: {
-      familia: 'Great Vibes',
-      tamanho: 24,
-      peso: 'bold',
-      estilo: 'normal',
-      cor: 'hsl(142, 35%, 45%)',
-      alinhamento: 'center'
-    },
-    editavel: true,
-    visivel: true
-  },
-  {
-    id: 'names',
-    tipo: 'nomes',
-    texto: 'Seu Nome & Nome do Parceiro',
-    posicao: { x: 50, y: 30 },
-    tamanho: { width: 400, height: 80 },
-    fonte: {
-      familia: 'Playfair Display',
-      tamanho: 32,
-      peso: 'bold',
-      estilo: 'normal',
-      cor: 'hsl(160, 25%, 15%)',
-      alinhamento: 'center'
-    },
-    editavel: true,
-    visivel: true
-  },
-  {
-    id: 'message',
-    tipo: 'mensagem',
-    texto: 'O amor é a ponte entre duas almas',
-    posicao: { x: 50, y: 75 },
-    tamanho: { width: 350, height: 60 },
-    fonte: {
-      familia: 'Dancing Script',
-      tamanho: 18,
-      peso: 'normal',
-      estilo: 'italic',
-      cor: 'hsl(160, 25%, 15%)',
-      alinhamento: 'center'
-    },
-    editavel: true,
-    visivel: true
-  }
-];
+// By default, the customization step should not inject text elements for
+// header/names/message because those core details come from the Basic Data.
+// Leave the list empty so users can add only additional custom texts.
+const defaultTextElements: ElementoTexto[] = [];
 
 const defaultCanvasSettings: CanvasSettings = {
   aspectRatio: 'portrait',
@@ -133,13 +84,14 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
     loadGoogleFonts();
   }, []);
 
-  // Initialize default elements if not present
+  // Initialize canvas defaults and keep any existing custom texts without
+  // introducing duplicated core text layers.
   useEffect(() => {
-    if (!design.elementosTexto || design.elementosTexto.length === 0) {
+    if (!design.canvasSettings) {
       onDesignChange({
         ...design,
-        elementosTexto: defaultTextElements,
-        canvasSettings: defaultCanvasSettings
+        canvasSettings: defaultCanvasSettings,
+        elementosTexto: design.elementosTexto || defaultTextElements
       });
     }
   }, []);

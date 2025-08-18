@@ -45,6 +45,8 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
   editMode = false
 }) => {
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
+  // Disable inline editing for core text (header, names, message) to avoid
+  // conflicts with Basic Data. We still keep selection for decorative items.
   const [editingText, setEditingText] = useState<string | null>(null);
 
   const {
@@ -86,6 +88,9 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
 
   const handleTextClick = (elementId: string) => {
     if (!editMode) return;
+    // Prevent editing for reserved ids that mirror Basic Data
+    const lockedIds = new Set(['header-title', 'names', 'message']);
+    if (lockedIds.has(elementId)) return;
     setEditingText(elementId);
   };
 
@@ -184,6 +189,11 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
   };
 
   const renderTextElement = (elemento: ElementoTexto) => {
+    // Skip rendering of reserved core text elements that are sourced from
+    // Basic Data and already rendered separately below.
+    if (['header-title', 'names', 'message'].includes(elemento.id)) {
+      return null;
+    }
     const isSelected = selectedElement === elemento.id;
     const isEditing = editingText === elemento.id;
 
@@ -235,7 +245,11 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
               variant="ghost"
               onClick={(e) => {
                 e.stopPropagation();
-                setEditingText(elemento.id);
+                // Only allow editing for non-reserved text elements
+                const lockedIds = new Set(['header-title', 'names', 'message']);
+                if (!lockedIds.has(elemento.id)) {
+                  setEditingText(elemento.id);
+                }
               }}
             >
               <Edit3 className="w-3 h-3" />
