@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { CasalData, ConviteDesign, ElementoDesign, ElementoTexto, FonteTexto, CanvasSettings } from '@/types/wedding';
-import { Heart, Flower, Music, Upload, Palette, Sparkles, Edit3, Type, Plus, Trash2, Download, Share2, RotateCw, Move, Maximize2, Grid, Lock, Unlock } from 'lucide-react';
+import { Heart, Flower, Music, Upload, Palette, Sparkles, Edit3, Type, Plus, Trash2, Download, Share2, RotateCw, Move, Maximize2, Grid, Lock, Unlock, Star, Cross, Ribbon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { InvitationPreview } from './invitation-preview';
 import { fontOptions, getFontFamily, loadGoogleFonts } from '@/data/fonts';
@@ -295,11 +295,12 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
         </CardHeader>
         <CardContent className="space-y-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className="grid w-full grid-cols-7">
               <TabsTrigger value="cores">Cores</TabsTrigger>
               <TabsTrigger value="fundo">Fundo</TabsTrigger>
               <TabsTrigger value="textos">Textos</TabsTrigger>
               <TabsTrigger value="elementos">Elementos</TabsTrigger>
+              <TabsTrigger value="decoracoes">Decorações</TabsTrigger>
               <TabsTrigger value="canvas">Canvas</TabsTrigger>
               <TabsTrigger value="musica">Música</TabsTrigger>
             </TabsList>
@@ -497,6 +498,176 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
                   step={5}
                   className="w-full"
                 />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="decoracoes" className="space-y-6 mt-6">
+              <div className="border rounded-lg p-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-medium">Elementos Decorativos do Cabeçalho</Label>
+                  <div className="flex items-center space-x-2">
+                    <Label className="text-xs">Mostrar</Label>
+                    <Switch
+                      checked={design.decoracaoCabecalho?.habilitado ?? true}
+                      onCheckedChange={(checked) => onDesignChange({
+                        ...design,
+                        decoracaoCabecalho: {
+                          habilitado: checked,
+                          tipo: design.decoracaoCabecalho?.tipo || 'coracao',
+                          cor: design.decoracaoCabecalho?.cor || (design.corPrimaria || '#4B9B68'),
+                          tamanho: design.decoracaoCabecalho?.tamanho || 20,
+                          espacamento: design.decoracaoCabecalho?.espacamento || 8,
+                          deslocamentoX: design.decoracaoCabecalho?.deslocamentoX || 0,
+                        }
+                      })}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {[
+                    { value: 'coracao', label: 'Corações', icon: Heart },
+                    { value: 'estrela', label: 'Estrelas', icon: Star },
+                    { value: 'flor', label: 'Flores', icon: Flower },
+                    { value: 'cruz', label: 'Cruz', icon: Cross },
+                    { value: 'lacinho', label: 'Lacinho', icon: Ribbon },
+                  ].map((opt) => (
+                    <Button
+                      key={opt.value}
+                      type="button"
+                      variant={(design.decoracaoCabecalho?.tipo || 'coracao') === (opt.value as any) ? 'default' : 'outline'}
+                      onClick={() => onDesignChange({
+                        ...design,
+                        decoracaoCabecalho: {
+                          habilitado: design.decoracaoCabecalho?.habilitado ?? true,
+                          tipo: opt.value as any,
+                          cor: design.decoracaoCabecalho?.cor || (design.corPrimaria || '#4B9B68'),
+                          tamanho: design.decoracaoCabecalho?.tamanho || 20,
+                          espacamento: design.decoracaoCabecalho?.espacamento || 8,
+                          deslocamentoX: design.decoracaoCabecalho?.deslocamentoX || 0,
+                        }
+                      })}
+                      className="h-16 flex-col"
+                    >
+                      <opt.icon className="w-5 h-5" />
+                      <span className="text-xs">{opt.label}</span>
+                    </Button>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center space-x-3">
+                    <Label className="w-24 text-xs">Cor</Label>
+                    <div
+                      className="w-8 h-8 rounded border border-border cursor-pointer"
+                      style={{ backgroundColor: design.decoracaoCabecalho?.cor || design.corPrimaria || '#4B9B68' }}
+                      onClick={() => document.getElementById('decoracao-cor')?.click()}
+                    />
+                    <Input
+                      id="decoracao-cor"
+                      type="color"
+                      value={(design.decoracaoCabecalho?.cor || design.corPrimaria || '#4B9B68') as string}
+                      onChange={(e) => onDesignChange({
+                        ...design,
+                        decoracaoCabecalho: {
+                          habilitado: design.decoracaoCabecalho?.habilitado ?? true,
+                          tipo: design.decoracaoCabecalho?.tipo || 'coracao',
+                          cor: e.target.value,
+                          tamanho: design.decoracaoCabecalho?.tamanho || 20,
+                          espacamento: design.decoracaoCabecalho?.espacamento || 8,
+                          deslocamentoX: design.decoracaoCabecalho?.deslocamentoX || 0,
+                        }
+                      })}
+                      className="sr-only"
+                    />
+                  </div>
+
+                  <div className="flex items-center space-x-3">
+                    <Label className="w-24 text-xs">Tamanho</Label>
+                    <Slider
+                      value={[design.decoracaoCabecalho?.tamanho || 20]}
+                      onValueChange={(v) => onDesignChange({
+                        ...design,
+                        decoracaoCabecalho: {
+                          habilitado: design.decoracaoCabecalho?.habilitado ?? true,
+                          tipo: design.decoracaoCabecalho?.tipo || 'coracao',
+                          cor: design.decoracaoCabecalho?.cor || design.corPrimaria || '#4B9B68',
+                          tamanho: v[0],
+                          espacamento: design.decoracaoCabecalho?.espacamento || 8,
+                          deslocamentoX: design.decoracaoCabecalho?.deslocamentoX || 0,
+                        }
+                      })}
+                      min={10}
+                      max={48}
+                      step={1}
+                      className="flex-1"
+                    />
+                  </div>
+
+                  <div className="flex items-center space-x-3">
+                    <Label className="w-24 text-xs">Espaçamento</Label>
+                    <Slider
+                      value={[design.decoracaoCabecalho?.espacamento || 8]}
+                      onValueChange={(v) => onDesignChange({
+                        ...design,
+                        decoracaoCabecalho: {
+                          habilitado: design.decoracaoCabecalho?.habilitado ?? true,
+                          tipo: design.decoracaoCabecalho?.tipo || 'coracao',
+                          cor: design.decoracaoCabecalho?.cor || design.corPrimaria || '#4B9B68',
+                          tamanho: design.decoracaoCabecalho?.tamanho || 20,
+                          espacamento: v[0],
+                          deslocamentoX: design.decoracaoCabecalho?.deslocamentoX || 0,
+                        }
+                      })}
+                      min={0}
+                      max={32}
+                      step={1}
+                      className="flex-1"
+                    />
+                  </div>
+
+                  <div className="flex items-center space-x-3">
+                    <Label className="w-24 text-xs">Deslocamento X</Label>
+                    <Slider
+                      value={[design.decoracaoCabecalho?.deslocamentoX || 0]}
+                      onValueChange={(v) => onDesignChange({
+                        ...design,
+                        decoracaoCabecalho: {
+                          habilitado: design.decoracaoCabecalho?.habilitado ?? true,
+                          tipo: design.decoracaoCabecalho?.tipo || 'coracao',
+                          cor: design.decoracaoCabecalho?.cor || design.corPrimaria || '#4B9B68',
+                          tamanho: design.decoracaoCabecalho?.tamanho || 20,
+                          espacamento: design.decoracaoCabecalho?.espacamento || 8,
+                          deslocamentoX: v[0],
+                        }
+                      })}
+                      min={-50}
+                      max={50}
+                      step={1}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onDesignChange({
+                      ...design,
+                      decoracaoCabecalho: {
+                        habilitado: true,
+                        tipo: 'coracao',
+                        cor: '#4B9B68',
+                        tamanho: 20,
+                        espacamento: 8,
+                        deslocamentoX: 0,
+                      }
+                    })}
+                  >
+                    Resetar para padrão
+                  </Button>
+                </div>
               </div>
             </TabsContent>
 

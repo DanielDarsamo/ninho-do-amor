@@ -79,6 +79,8 @@ export interface ConviteDesign {
   // Background gallery options
   backgroundGallery?: string[];
   backgroundIndex?: number;
+  // Header decorations (icons flanking title)
+  decoracaoCabecalho?: HeaderDecoration;
 }
 
 export interface ElementoDesign {
@@ -91,6 +93,15 @@ export interface ElementoDesign {
   texto?: string;
   editavel: boolean;
   visivel: boolean;
+}
+
+export interface HeaderDecoration {
+  habilitado: boolean;
+  tipo: 'coracao' | 'estrela' | 'flor' | 'cruz' | 'lacinho';
+  cor: string;
+  tamanho: number; // px
+  espacamento: number; // gap between icon and title, px
+  deslocamentoX: number; // nudge entire decoration/title row horizontally, px
 }
 
 export interface RSVP {

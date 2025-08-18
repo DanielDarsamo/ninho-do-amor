@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { CasalData, ConviteDesign, ElementoDesign, ElementoTexto, FonteTexto, CanvasSettings } from '@/types/wedding';
-import { Heart, Calendar, MapPin, Flower, Sparkles, Edit3, X, RotateCw, Palette, Type, Move } from 'lucide-react';
+import { Heart, Calendar, MapPin, Flower, Sparkles, Edit3, X, RotateCw, Palette, Type, Move, Star, Cross, Ribbon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -76,7 +76,8 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
     estiloMensagem,
     estiloRodape,
     tituloConviteTexto,
-    tituloConviteCor
+    tituloConviteCor,
+    decoracaoCabecalho
   } = design;
 
   const formatDate = (date?: Date) => {
@@ -369,11 +370,26 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
         <div className="relative p-8 text-center space-y-6">
           {/* Header */}
           <div className="space-y-2">
-            <div 
-              className="flex items-center justify-center space-x-2 text-primary mb-4 cursor-pointer"
+            <div
+              className="flex items-center justify-center mb-4 cursor-pointer"
               onClick={() => editMode && handleTextClick('header-title')}
+              style={{ gap: `${decoracaoCabecalho?.espacamento ?? 8}px`, transform: `translateX(${decoracaoCabecalho?.deslocamentoX ?? 0}px)` }}
             >
-              <Heart className="w-5 h-5 fill-current" />
+              {decoracaoCabecalho?.habilitado !== false && (
+                (() => {
+                  const IconLeft = decoracaoCabecalho?.tipo === 'coracao' ? Heart :
+                                   decoracaoCabecalho?.tipo === 'estrela' ? Star :
+                                   decoracaoCabecalho?.tipo === 'flor' ? Flower :
+                                   decoracaoCabecalho?.tipo === 'cruz' ? Cross : Ribbon;
+                  return (
+                    <IconLeft
+                      className="fill-current"
+                      style={{ color: decoracaoCabecalho?.cor || corPrimaria }}
+                      size={decoracaoCabecalho?.tamanho || 20}
+                    />
+                  );
+                })()
+              )}
               <span
                 className="text-sm font-medium tracking-wider"
                 style={{
@@ -388,7 +404,21 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
               >
                 {tituloConviteTexto || 'CONVITE DE CASAMENTO'}
               </span>
-              <Heart className="w-5 h-5 fill-current" />
+              {decoracaoCabecalho?.habilitado !== false && (
+                (() => {
+                  const IconRight = decoracaoCabecalho?.tipo === 'coracao' ? Heart :
+                                    decoracaoCabecalho?.tipo === 'estrela' ? Star :
+                                    decoracaoCabecalho?.tipo === 'flor' ? Flower :
+                                    decoracaoCabecalho?.tipo === 'cruz' ? Cross : Ribbon;
+                  return (
+                    <IconRight
+                      className="fill-current"
+                      style={{ color: decoracaoCabecalho?.cor || corPrimaria }}
+                      size={decoracaoCabecalho?.tamanho || 20}
+                    />
+                  );
+                })()
+              )}
             </div>
             
             <h1 
