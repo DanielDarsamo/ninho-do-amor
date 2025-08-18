@@ -147,13 +147,13 @@ const Create = () => {
                   </div>
                 </div>
                 
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                   <Button variant="outline" onClick={handleBack}>
                     Voltar
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button className="bg-gradient-primary min-h-[48px] min-w-[48px]">
+                      <Button className="bg-gradient-primary">
                         <Download className="w-4 h-4 mr-2" />
                         Baixar Convite
                       </Button>
