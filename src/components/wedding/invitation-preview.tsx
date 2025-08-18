@@ -416,7 +416,7 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
         <div className="relative p-8 text-center space-y-6">
           {/* Header */}
           <div className="space-y-2">
-            <div
+            <div 
               className="flex items-center justify-center mb-4 cursor-pointer"
               onClick={() => editMode && handleTextClick('header-title')}
               style={{ gap: `${decoracaoCabecalho?.espacamento ?? 8}px`, transform: `translateX(${decoracaoCabecalho?.deslocamentoX ?? 0}px)` }}
@@ -503,7 +503,12 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
               ) : (
                 <>
                   {primeiroNome} {sobrenome}
-                  <span className="block text-xl my-2 text-primary">&</span>
+                  <span
+                    className="block text-xl my-2"
+                    style={{ color: estiloNomes?.cor || corTexto }}
+                  >
+                    &
+                  </span>
                   {parceiroPrimeiroNome} {parceiroSobrenome}
                 </>
               )}
@@ -561,7 +566,7 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
                   }}
                 />
               )}
-            </div>
+          </div>
           )}
 
           {/* Event Details */}
@@ -692,12 +697,12 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
             </SheetContent>
           </Sheet>
         ) : (
-          <Card className="absolute top-0 right-0 w-80 z-10">
-            <CardContent className="p-4">
-              <h3 className="font-medium mb-3">Editar Elemento</h3>
+        <Card className="absolute top-0 right-0 w-80 z-10">
+          <CardContent className="p-4">
+            <h3 className="font-medium mb-3">Editar Elemento</h3>
               {/* Placeholder for desktop side panel controls (future extension) */}
-            </CardContent>
-          </Card>
+          </CardContent>
+        </Card>
         )
       )}
     </div>

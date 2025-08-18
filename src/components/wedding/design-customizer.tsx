@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { CasalData, ConviteDesign, ElementoDesign, ElementoTexto, FonteTexto, CanvasSettings } from '@/types/wedding';
-import { Heart, Flower, Music, Upload, Palette, Sparkles, Edit3, Type, Plus, Trash2, Download, Share2, RotateCw, Move, Maximize2, Grid, Lock, Unlock, Star, Cross, Ribbon } from 'lucide-react';
+import { Heart, Flower, Upload, Palette, Sparkles, Type, Plus, Trash2, Share2, RotateCw, Move, Maximize2, Grid, Lock, Unlock, Star, Cross, Ribbon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { InvitationPreview } from './invitation-preview';
 import { fontOptions, getFontFamily, loadGoogleFonts } from '@/data/fonts';
@@ -76,7 +76,7 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState('cores');
   const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
-  const [editMode, setEditMode] = useState(false);
+  // Edit mode is always enabled; we removed the toggle
   const [backgroundCategory, setBackgroundCategory] = useState<string>('all');
 
   // Load Google Fonts on component mount
@@ -227,24 +227,7 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
     });
   };
 
-  const handleMusicUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        onDesignChange({
-          ...design,
-          musicaUrl: result
-        });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const generateInvitation = async () => {
-    alert('Convite gerado com sucesso! Em breve você receberá o link para compartilhamento.');
-  };
+  
 
   const filteredBackgrounds = backgroundCategory === 'all' 
     ? backgroundOptions 
@@ -256,31 +239,13 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-medium">Visualização</h3>
-          <div className="flex space-x-2">
-            <Button
-              variant={editMode ? "default" : "outline"}
-              size="sm"
-              onClick={() => setEditMode(!editMode)}
-            >
-              <Edit3 className="w-4 h-4 mr-2" />
-              {editMode ? 'Sair do Modo Edição' : 'Modo Edição'}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={generateInvitation}
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Gerar Convite
-            </Button>
-          </div>
         </div>
         
         <InvitationPreview
           casal={casal}
           design={design}
           onDesignChange={onDesignChange}
-          editMode={editMode}
+          editMode={true}
           className="w-full"
         />
       </div>
@@ -295,14 +260,13 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
         </CardHeader>
         <CardContent className="space-y-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-7 sm:grid-cols-7 overflow-x-auto whitespace-nowrap gap-2 scrollbar-none">
+            <TabsList className="flex w-full overflow-x-auto whitespace-nowrap gap-2 px-1">
               <TabsTrigger value="cores" className="min-w-max">Cores</TabsTrigger>
               <TabsTrigger value="fundo" className="min-w-max">Fundo</TabsTrigger>
               <TabsTrigger value="textos" className="min-w-max">Textos</TabsTrigger>
               <TabsTrigger value="elementos" className="min-w-max">Elementos</TabsTrigger>
               <TabsTrigger value="decoracoes" className="min-w-max">Decorações</TabsTrigger>
               <TabsTrigger value="canvas" className="min-w-max">Canvas</TabsTrigger>
-              <TabsTrigger value="musica" className="min-w-max">Música</TabsTrigger>
             </TabsList>
 
             <TabsContent value="cores" className="space-y-6 mt-6">
@@ -1422,31 +1386,7 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
               </div>
             </TabsContent>
 
-            <TabsContent value="musica" className="space-y-6 mt-6">
-              <div>
-                <Label className="text-sm font-medium mb-3 block">Música de Fundo</Label>
-                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-                  <Music className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Adicione uma música especial para tocar quando o convite for aberto
-                  </p>
-                  <Input
-                    type="file"
-                    accept="audio/*"
-                    onChange={handleMusicUpload}
-                    className="w-full"
-                  />
-                </div>
-                
-                {design.musicaUrl && (
-                  <div className="mt-4 p-3 bg-muted rounded-lg">
-                    <p className="text-sm text-muted-foreground">
-                      ✓ Música adicionada com sucesso
-                    </p>
-                  </div>
-                )}
-              </div>
-            </TabsContent>
+            {/* Música tab removida para simplificar o painel */}
           </Tabs>
 
           <div className="flex justify-between pt-6 border-t">
