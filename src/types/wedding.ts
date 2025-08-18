@@ -70,6 +70,12 @@ export interface ConviteDesign {
   mensagemCor?: string;
   fonteTitulo?: string;
   fonteCorpo?: string;
+  // Text style overrides for core, non-editable texts
+  estiloTitulo?: FonteTexto;
+  estiloNomes?: FonteTexto;
+  estiloDetalhes?: FonteTexto; // date & location
+  estiloMensagem?: FonteTexto;
+  estiloRodape?: FonteTexto; // "Sua presença é o nosso maior presente"
   // Background gallery options
   backgroundGallery?: string[];
   backgroundIndex?: number;

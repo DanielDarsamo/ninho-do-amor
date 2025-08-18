@@ -69,7 +69,14 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
     elementosTexto = [],
     musicaUrl,
     mensagemPersonalizada = 'O amor é a ponte entre duas almas',
-    canvasSettings
+    canvasSettings,
+    estiloTitulo,
+    estiloNomes,
+    estiloDetalhes,
+    estiloMensagem,
+    estiloRodape,
+    tituloConviteTexto,
+    tituloConviteCor
   } = design;
 
   const formatDate = (date?: Date) => {
@@ -367,27 +374,33 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
               onClick={() => editMode && handleTextClick('header-title')}
             >
               <Heart className="w-5 h-5 fill-current" />
-              <span className="text-sm font-medium tracking-wider">
-                {editingText === 'header-title' ? (
-                  <Input
-                    value="CONVITE DE CASAMENTO"
-                    onChange={(e) => {
-                      // Update header text
-                    }}
-                    onBlur={() => setEditingText(null)}
-                    autoFocus
-                    className="text-center"
-                  />
-                ) : (
-                  "CONVITE DE CASAMENTO"
-                )}
+              <span
+                className="text-sm font-medium tracking-wider"
+                style={{
+                  color: tituloConviteCor || corPrimaria,
+                  fontFamily: estiloTitulo?.familia && getFontFamily(estiloTitulo.familia),
+                  fontSize: estiloTitulo?.tamanho,
+                  fontWeight: estiloTitulo?.peso,
+                  fontStyle: estiloTitulo?.estilo,
+                  textDecoration: estiloTitulo?.decoracao,
+                  letterSpacing: estiloTitulo?.espacamentoLetras,
+                } as React.CSSProperties}
+              >
+                {tituloConviteTexto || 'CONVITE DE CASAMENTO'}
               </span>
               <Heart className="w-5 h-5 fill-current" />
             </div>
             
             <h1 
               className="font-heading text-3xl text-center leading-tight cursor-pointer"
-              style={{ color: corTexto }}
+              style={{
+                color: estiloNomes?.cor || corTexto,
+                fontFamily: estiloNomes?.familia && getFontFamily(estiloNomes.familia),
+                fontSize: estiloNomes?.tamanho || 30,
+                fontWeight: estiloNomes?.peso || 'bold',
+                fontStyle: estiloNomes?.estilo || 'normal',
+                textAlign: estiloNomes?.alinhamento || 'center',
+              } as React.CSSProperties}
               onClick={() => editMode && handleTextClick('names')}
             >
               {editingText === 'names' ? (
@@ -438,44 +451,63 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
           <div className="space-y-4">
             <div className="flex items-center justify-center space-x-2 text-muted-foreground">
               <Calendar className="w-4 h-4" />
-              <span className="text-sm">{formatDate(dataCasamento)}</span>
+              <span
+                className="text-sm"
+                style={{
+                  color: estiloDetalhes?.cor,
+                  fontFamily: estiloDetalhes?.familia && getFontFamily(estiloDetalhes.familia),
+                  fontSize: estiloDetalhes?.tamanho,
+                  fontWeight: estiloDetalhes?.peso,
+                  fontStyle: estiloDetalhes?.estilo,
+                } as React.CSSProperties}
+              >
+                {formatDate(dataCasamento)}
+              </span>
             </div>
             
             <div className="flex items-center justify-center space-x-2 text-muted-foreground">
               <MapPin className="w-4 h-4" />
-              <span className="text-sm">{cidade}, {provincia}</span>
+              <span
+                className="text-sm"
+                style={{
+                  color: estiloDetalhes?.cor,
+                  fontFamily: estiloDetalhes?.familia && getFontFamily(estiloDetalhes.familia),
+                  fontSize: estiloDetalhes?.tamanho,
+                  fontWeight: estiloDetalhes?.peso,
+                  fontStyle: estiloDetalhes?.estilo,
+                } as React.CSSProperties}
+              >
+                {cidade}, {provincia}
+              </span>
             </div>
           </div>
 
           {/* Message */}
           <div className="space-y-2">
-            <p 
-              className="text-sm text-muted-foreground italic cursor-pointer"
-              onClick={() => editMode && handleTextClick('message')}
+            <p
+              className="text-sm italic text-center"
+              style={{
+                color: estiloMensagem?.cor || undefined,
+                fontFamily: estiloMensagem?.familia && getFontFamily(estiloMensagem.familia),
+                fontSize: estiloMensagem?.tamanho,
+                fontWeight: estiloMensagem?.peso,
+                fontStyle: estiloMensagem?.estilo || 'italic',
+              } as React.CSSProperties}
             >
-              {editingText === 'message' ? (
-                <Textarea
-                  value={mensagemPersonalizada}
-                  onChange={(e) => {
-                    if (onDesignChange) {
-                      onDesignChange({
-                        ...design,
-                        mensagemPersonalizada: e.target.value
-                      });
-                    }
-                  }}
-                  onBlur={() => setEditingText(null)}
-                  autoFocus
-                  className="text-center resize-none"
-                  placeholder="Digite sua mensagem personalizada..."
-                />
-              ) : (
-                `"${mensagemPersonalizada}"`
-              )}
+              {`"${mensagemPersonalizada}"`}
             </p>
             
             <div className="pt-4">
-              <p className="text-xs text-muted-foreground">
+              <p
+                className="text-xs text-center"
+                style={{
+                  color: estiloRodape?.cor || 'var(--muted-foreground)',
+                  fontFamily: estiloRodape?.familia && getFontFamily(estiloRodape.familia),
+                  fontSize: estiloRodape?.tamanho,
+                  fontWeight: estiloRodape?.peso,
+                  fontStyle: estiloRodape?.estilo,
+                } as React.CSSProperties}
+              >
                 Sua presença é o nosso maior presente
               </p>
             </div>

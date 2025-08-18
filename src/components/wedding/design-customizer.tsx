@@ -501,8 +501,287 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
             </TabsContent>
 
             <TabsContent value="textos" className="space-y-6 mt-6">
+              {/* Core text styling controls */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Título "Convite de Casamento" */}
+                <div className="border rounded-lg p-4 space-y-3">
+                  <Label className="text-sm font-medium">Título do Convite</Label>
+                  <Input
+                    value={design.tituloConviteTexto || 'CONVITE DE CASAMENTO'}
+                    onChange={(e) => onDesignChange({ ...design, tituloConviteTexto: e.target.value })}
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="text-xs">Fonte</Label>
+                      <Select
+                        value={design.estiloTitulo?.familia || 'Great Vibes'}
+                        onValueChange={(value) => onDesignChange({
+                          ...design,
+                          estiloTitulo: { ...(design.estiloTitulo || { tamanho: 14, peso: 'normal', estilo: 'normal', cor: design.corPrimaria || '#000' }), familia: value }
+                        })}
+                      >
+                        <SelectTrigger className="text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {fontOptions.map((font) => (
+                            <SelectItem key={font.value} value={font.value}>
+                              <span style={{ fontFamily: getFontFamily(font.value) }}>{font.label}</span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Tamanho</Label>
+                      <Slider
+                        value={[design.estiloTitulo?.tamanho || 14]}
+                        onValueChange={(v) => onDesignChange({
+                          ...design,
+                          estiloTitulo: { ...(design.estiloTitulo || { familia: 'Great Vibes', peso: 'normal', estilo: 'normal', cor: design.corPrimaria || '#000' }), tamanho: v[0] }
+                        })}
+                        min={10}
+                        max={48}
+                        step={1}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Cor</Label>
+                      <div className="flex items-center space-x-2">
+                        <div
+                          className="w-6 h-6 rounded border border-border cursor-pointer"
+                          style={{ backgroundColor: design.tituloConviteCor || design.corPrimaria || '#000' }}
+                          onClick={() => document.getElementById('titulo-cor')?.click()}
+                        />
+                        <Input id="titulo-cor" type="color" className="sr-only" value={design.tituloConviteCor || design.corPrimaria || '#000'} onChange={(e) => onDesignChange({ ...design, tituloConviteCor: e.target.value })} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-end">
+                    <Button variant="ghost" size="sm" onClick={() => onDesignChange({ ...design, estiloTitulo: undefined, tituloConviteTexto: undefined, tituloConviteCor: undefined })}>Resetar</Button>
+                  </div>
+                </div>
+
+                {/* Nomes do casal */}
+                <div className="border rounded-lg p-4 space-y-3">
+                  <Label className="text-sm font-medium">Nomes do Casal</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="text-xs">Fonte</Label>
+                      <Select
+                        value={design.estiloNomes?.familia || 'Playfair Display'}
+                        onValueChange={(value) => onDesignChange({
+                          ...design,
+                          estiloNomes: { ...(design.estiloNomes || { tamanho: 30, peso: 'bold', estilo: 'normal', cor: design.corTexto || '#000', alinhamento: 'center' }), familia: value }
+                        })}
+                      >
+                        <SelectTrigger className="text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {fontOptions.map((font) => (
+                            <SelectItem key={font.value} value={font.value}>
+                              <span style={{ fontFamily: getFontFamily(font.value) }}>{font.label}</span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Tamanho</Label>
+                      <Slider
+                        value={[design.estiloNomes?.tamanho || 30]}
+                        onValueChange={(v) => onDesignChange({
+                          ...design,
+                          estiloNomes: { ...(design.estiloNomes || { familia: 'Playfair Display', peso: 'bold', estilo: 'normal', cor: design.corTexto || '#000', alinhamento: 'center' }), tamanho: v[0] }
+                        })}
+                        min={20}
+                        max={64}
+                        step={1}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Alinhamento</Label>
+                      <Select
+                        value={design.estiloNomes?.alinhamento || 'center'}
+                        onValueChange={(value) => onDesignChange({
+                          ...design,
+                          estiloNomes: { ...(design.estiloNomes || { familia: 'Playfair Display', tamanho: 30, peso: 'bold', estilo: 'normal', cor: design.corTexto || '#000' }), alinhamento: value as any }
+                        })}
+                      >
+                        <SelectTrigger className="text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="left">Esquerda</SelectItem>
+                          <SelectItem value="center">Centro</SelectItem>
+                          <SelectItem value="right">Direita</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Cor</Label>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-6 h-6 rounded border border-border cursor-pointer" style={{ backgroundColor: design.estiloNomes?.cor || design.corTexto || '#000' }} onClick={() => document.getElementById('nomes-cor')?.click()} />
+                        <Input id="nomes-cor" type="color" className="sr-only" value={design.estiloNomes?.cor || design.corTexto || '#000'} onChange={(e) => onDesignChange({ ...design, estiloNomes: { ...(design.estiloNomes || {} as any), cor: e.target.value } })} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-end">
+                    <Button variant="ghost" size="sm" onClick={() => onDesignChange({ ...design, estiloNomes: undefined })}>Resetar</Button>
+                  </div>
+                </div>
+
+                {/* Detalhes (data e local) */}
+                <div className="border rounded-lg p-4 space-y-3">
+                  <Label className="text-sm font-medium">Detalhes (Data e Local)</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="text-xs">Fonte</Label>
+                      <Select
+                        value={design.estiloDetalhes?.familia || 'Montserrat'}
+                        onValueChange={(value) => onDesignChange({
+                          ...design,
+                          estiloDetalhes: { ...(design.estiloDetalhes || { tamanho: 14, peso: 'normal', estilo: 'normal', cor: '#6B7280' }), familia: value }
+                        })}
+                      >
+                        <SelectTrigger className="text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {fontOptions.map((font) => (
+                            <SelectItem key={font.value} value={font.value}>
+                              <span style={{ fontFamily: getFontFamily(font.value) }}>{font.label}</span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Tamanho</Label>
+                      <Slider
+                        value={[design.estiloDetalhes?.tamanho || 14]}
+                        onValueChange={(v) => onDesignChange({
+                          ...design,
+                          estiloDetalhes: { ...(design.estiloDetalhes || { familia: 'Montserrat', peso: 'normal', estilo: 'normal', cor: '#6B7280' }), tamanho: v[0] }
+                        })}
+                        min={10}
+                        max={24}
+                        step={1}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Cor</Label>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-6 h-6 rounded border border-border cursor-pointer" style={{ backgroundColor: design.estiloDetalhes?.cor || '#6B7280' }} onClick={() => document.getElementById('detalhes-cor')?.click()} />
+                        <Input id="detalhes-cor" type="color" className="sr-only" value={design.estiloDetalhes?.cor || '#6B7280'} onChange={(e) => onDesignChange({ ...design, estiloDetalhes: { ...(design.estiloDetalhes || {} as any), cor: e.target.value } })} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-end">
+                    <Button variant="ghost" size="sm" onClick={() => onDesignChange({ ...design, estiloDetalhes: undefined })}>Resetar</Button>
+                  </div>
+                </div>
+
+                {/* Mensagem personalizada */}
+                <div className="border rounded-lg p-4 space-y-3">
+                  <Label className="text-sm font-medium">Mensagem</Label>
+                  <Textarea
+                    value={design.mensagemPersonalizada || 'O amor é a ponte entre duas almas'}
+                    onChange={(e) => onDesignChange({ ...design, mensagemPersonalizada: e.target.value })}
+                    className="min-h-[80px]"
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="text-xs">Fonte</Label>
+                      <Select
+                        value={design.estiloMensagem?.familia || 'Dancing Script'}
+                        onValueChange={(value) => onDesignChange({
+                          ...design,
+                          estiloMensagem: { ...(design.estiloMensagem || { tamanho: 16, peso: 'normal', estilo: 'italic', cor: design.corTexto || '#000' }), familia: value }
+                        })}
+                      >
+                        <SelectTrigger className="text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {fontOptions.map((font) => (
+                            <SelectItem key={font.value} value={font.value}>
+                              <span style={{ fontFamily: getFontFamily(font.value) }}>{font.label}</span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Tamanho</Label>
+                      <Slider
+                        value={[design.estiloMensagem?.tamanho || 16]}
+                        onValueChange={(v) => onDesignChange({
+                          ...design,
+                          estiloMensagem: { ...(design.estiloMensagem || { familia: 'Dancing Script', peso: 'normal', estilo: 'italic', cor: design.corTexto || '#000' }), tamanho: v[0] }
+                        })}
+                        min={12}
+                        max={28}
+                        step={1}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Cor</Label>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-6 h-6 rounded border border-border cursor-pointer" style={{ backgroundColor: design.estiloMensagem?.cor || design.corTexto || '#000' }} onClick={() => document.getElementById('mensagem-cor')?.click()} />
+                        <Input id="mensagem-cor" type="color" className="sr-only" value={design.estiloMensagem?.cor || design.corTexto || '#000'} onChange={(e) => onDesignChange({ ...design, estiloMensagem: { ...(design.estiloMensagem || {} as any), cor: e.target.value } })} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-end">
+                    <Button variant="ghost" size="sm" onClick={() => onDesignChange({ ...design, estiloMensagem: undefined })}>Resetar</Button>
+                  </div>
+                </div>
+
+                {/* Rodapé */}
+                <div className="border rounded-lg p-4 space-y-3">
+                  <Label className="text-sm font-medium">Rodapé</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="text-xs">Fonte</Label>
+                      <Select
+                        value={design.estiloRodape?.familia || 'Montserrat'}
+                        onValueChange={(value) => onDesignChange({
+                          ...design,
+                          estiloRodape: { ...(design.estiloRodape || { tamanho: 12, peso: 'normal', estilo: 'normal', cor: '#6B7280' }), familia: value }
+                        })}
+                      >
+                        <SelectTrigger className="text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {fontOptions.map((font) => (
+                            <SelectItem key={font.value} value={font.value}>
+                              <span style={{ fontFamily: getFontFamily(font.value) }}>{font.label}</span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Tamanho</Label>
+                      <Slider
+                        value={[design.estiloRodape?.tamanho || 12]}
+                        onValueChange={(v) => onDesignChange({
+                          ...design,
+                          estiloRodape: { ...(design.estiloRodape || { familia: 'Montserrat', peso: 'normal', estilo: 'normal', cor: '#6B7280' }), tamanho: v[0] }
+                        })}
+                        min={10}
+                        max={20}
+                        step={1}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Cor</Label>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-6 h-6 rounded border border-border cursor-pointer" style={{ backgroundColor: design.estiloRodape?.cor || '#6B7280' }} onClick={() => document.getElementById('rodape-cor')?.click()} />
+                        <Input id="rodape-cor" type="color" className="sr-only" value={design.estiloRodape?.cor || '#6B7280'} onChange={(e) => onDesignChange({ ...design, estiloRodape: { ...(design.estiloRodape || {} as any), cor: e.target.value } })} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-end">
+                    <Button variant="ghost" size="sm" onClick={() => onDesignChange({ ...design, estiloRodape: undefined })}>Resetar</Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional custom texts created by the user */}
               <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium">Elementos de Texto</Label>
+                <Label className="text-sm font-medium">Elementos de Texto Personalizados</Label>
                 <Button size="sm" onClick={addTextElement}>
                   <Plus className="w-4 h-4 mr-2" />
                   Adicionar Texto
@@ -514,71 +793,35 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
                   <div key={elemento.id} className="border rounded-lg p-4 space-y-3">
                     <div className="flex items-center justify-between">
                       <Label className="text-sm font-medium">{elemento.tipo}</Label>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => removeTextElement(elemento.id)}
-                      >
+                      <Button size="sm" variant="ghost" onClick={() => removeTextElement(elemento.id)}>
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
 
-                    <Textarea
-                      value={elemento.texto}
-                      onChange={(e) => updateTextElement(elemento.id, { texto: e.target.value })}
-                      placeholder="Digite o texto..."
-                      className="text-sm"
-                    />
+                    <Textarea value={elemento.texto} onChange={(e) => updateTextElement(elemento.id, { texto: e.target.value })} placeholder="Digite o texto..." className="text-sm" />
 
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <Label className="text-xs">Família da Fonte</Label>
-                        <Select
-                          value={elemento.fonte.familia}
-                          onValueChange={(value) => updateTextElement(elemento.id, { 
-                            fonte: { ...elemento.fonte, familia: value }
-                          })}
-                        >
-                          <SelectTrigger className="text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
+                        <Label className="text-xs">Fonte</Label>
+                        <Select value={elemento.fonte.familia} onValueChange={(value) => updateTextElement(elemento.id, { fonte: { ...elemento.fonte, familia: value } })}>
+                          <SelectTrigger className="text-xs"><SelectValue /></SelectTrigger>
                           <SelectContent>
                             {fontOptions.map((font) => (
                               <SelectItem key={font.value} value={font.value}>
-                                <span style={{ fontFamily: getFontFamily(font.value) }}>
-                                  {font.label}
-                                </span>
+                                <span style={{ fontFamily: getFontFamily(font.value) }}>{font.label}</span>
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       </div>
-
                       <div>
                         <Label className="text-xs">Tamanho: {elemento.fonte.tamanho}px</Label>
-                        <Slider
-                          value={[elemento.fonte.tamanho]}
-                          onValueChange={(value) => updateTextElement(elemento.id, {
-                            fonte: { ...elemento.fonte, tamanho: value[0] }
-                          })}
-                          min={10}
-                          max={100}
-                          step={1}
-                          className="w-full"
-                        />
+                        <Slider value={[elemento.fonte.tamanho]} onValueChange={(value) => updateTextElement(elemento.id, { fonte: { ...elemento.fonte, tamanho: value[0] } })} min={10} max={100} step={1} className="w-full" />
                       </div>
-
                       <div>
                         <Label className="text-xs">Peso</Label>
-                        <Select
-                          value={elemento.fonte.peso}
-                          onValueChange={(value) => updateTextElement(elemento.id, {
-                            fonte: { ...elemento.fonte, peso: value as any }
-                          })}
-                        >
-                          <SelectTrigger className="text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
+                        <Select value={elemento.fonte.peso} onValueChange={(value) => updateTextElement(elemento.id, { fonte: { ...elemento.fonte, peso: value as any } })}>
+                          <SelectTrigger className="text-xs"><SelectValue /></SelectTrigger>
                           <SelectContent>
                             <SelectItem value="light">Light</SelectItem>
                             <SelectItem value="normal">Normal</SelectItem>
@@ -586,36 +829,20 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
                           </SelectContent>
                         </Select>
                       </div>
-
                       <div>
                         <Label className="text-xs">Estilo</Label>
-                        <Select
-                          value={elemento.fonte.estilo}
-                          onValueChange={(value) => updateTextElement(elemento.id, {
-                            fonte: { ...elemento.fonte, estilo: value as any }
-                          })}
-                        >
-                          <SelectTrigger className="text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
+                        <Select value={elemento.fonte.estilo} onValueChange={(value) => updateTextElement(elemento.id, { fonte: { ...elemento.fonte, estilo: value as any } })}>
+                          <SelectTrigger className="text-xs"><SelectValue /></SelectTrigger>
                           <SelectContent>
                             <SelectItem value="normal">Normal</SelectItem>
                             <SelectItem value="italic">Italic</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
-
                       <div>
                         <Label className="text-xs">Alinhamento</Label>
-                        <Select
-                          value={elemento.fonte.alinhamento || 'center'}
-                          onValueChange={(value) => updateTextElement(elemento.id, {
-                            fonte: { ...elemento.fonte, alinhamento: value as any }
-                          })}
-                        >
-                          <SelectTrigger className="text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
+                        <Select value={elemento.fonte.alinhamento || 'center'} onValueChange={(value) => updateTextElement(elemento.id, { fonte: { ...elemento.fonte, alinhamento: value as any } })}>
+                          <SelectTrigger className="text-xs"><SelectValue /></SelectTrigger>
                           <SelectContent>
                             <SelectItem value="left">Esquerda</SelectItem>
                             <SelectItem value="center">Centro</SelectItem>
@@ -624,31 +851,12 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
                           </SelectContent>
                         </Select>
                       </div>
-
                       <div>
                         <Label className="text-xs">Cor</Label>
                         <div className="flex items-center space-x-2 mt-1">
-                          <div
-                            className="w-6 h-6 rounded border border-border cursor-pointer"
-                            style={{ backgroundColor: elemento.fonte.cor }}
-                            onClick={() => document.getElementById(`color-${elemento.id}`)?.click()}
-                          />
-                          <Input
-                            id={`color-${elemento.id}`}
-                            type="color"
-                            value={elemento.fonte.cor}
-                            onChange={(e) => updateTextElement(elemento.id, {
-                              fonte: { ...elemento.fonte, cor: e.target.value }
-                            })}
-                            className="sr-only"
-                          />
-                          <Input
-                            value={elemento.fonte.cor}
-                            onChange={(e) => updateTextElement(elemento.id, {
-                              fonte: { ...elemento.fonte, cor: e.target.value }
-                            })}
-                            className="flex-1 text-xs"
-                          />
+                          <div className="w-6 h-6 rounded border border-border cursor-pointer" style={{ backgroundColor: elemento.fonte.cor }} onClick={() => document.getElementById(`color-${elemento.id}`)?.click()} />
+                          <Input id={`color-${elemento.id}`} type="color" value={elemento.fonte.cor} onChange={(e) => updateTextElement(elemento.id, { fonte: { ...elemento.fonte, cor: e.target.value } })} className="sr-only" />
+                          <Input value={elemento.fonte.cor} onChange={(e) => updateTextElement(elemento.id, { fonte: { ...elemento.fonte, cor: e.target.value } })} className="flex-1 text-xs" />
                         </div>
                       </div>
                     </div>
@@ -657,19 +865,7 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
               </div>
 
               <div>
-                <Label className="text-sm font-medium mb-3 block">Mensagem Personalizada</Label>
-                <Textarea
-                  value={design.mensagemPersonalizada || 'O amor é a ponte entre duas almas'}
-                  onChange={(e) => onDesignChange({
-                    ...design,
-                    mensagemPersonalizada: e.target.value
-                  })}
-                  placeholder="Digite sua mensagem personalizada ou versículo bíblico..."
-                  className="min-h-[100px]"
-                />
-                <p className="text-xs text-muted-foreground mt-2">
-                  Você pode usar uma mensagem personalizada ou um versículo bíblico como "1 Coríntios 13:4-7"
-                </p>
+                <p className="text-xs text-muted-foreground mt-2">Dica: use "Resetar" em cada bloco para voltar ao padrão.</p>
               </div>
             </TabsContent>
 
@@ -696,10 +892,32 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
               </div>
 
               {design.elementos && design.elementos.length > 0 && (
-                <div>
-                  <Label className="text-sm font-medium mb-3 block">
-                    Elementos Adicionados: {design.elementos.filter(el => el.visivel).length}/10
-                  </Label>
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium mb-3 block">Elementos Adicionados: {design.elementos.filter(el => el.visivel).length}/10</Label>
+                  <div className="space-y-3 max-h-64 overflow-y-auto">
+                    {design.elementos.map((el) => (
+                      <div key={el.id} className="border rounded-lg p-3 grid grid-cols-1 md:grid-cols-3 gap-3 items-center">
+                        <span className="text-xs capitalize">{el.tipo}</span>
+                        <div className="flex items-center space-x-2">
+                          <Label className="text-xs">Cor</Label>
+                          <div className="w-5 h-5 rounded border border-border cursor-pointer" style={{ backgroundColor: el.cor }} onClick={() => document.getElementById(`el-color-${el.id}`)?.click()} />
+                          <Input id={`el-color-${el.id}`} type="color" className="sr-only" value={el.cor} onChange={(e) => onDesignChange({ ...design, elementos: (design.elementos || []).map(x => x.id === el.id ? { ...x, cor: e.target.value } : x) })} />
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Label className="text-xs">Tam</Label>
+                          <Slider value={[el.tamanho]} onValueChange={(v) => onDesignChange({ ...design, elementos: (design.elementos || []).map(x => x.id === el.id ? { ...x, tamanho: v[0] } : x) })} min={8} max={64} step={1} />
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Label className="text-xs">X</Label>
+                          <Slider value={[el.posicao.x]} onValueChange={(v) => onDesignChange({ ...design, elementos: (design.elementos || []).map(x => x.id === el.id ? { ...x, posicao: { ...x.posicao, x: v[0] } } : x) })} min={0} max={100} step={1} />
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Label className="text-xs">Y</Label>
+                          <Slider value={[el.posicao.y]} onValueChange={(v) => onDesignChange({ ...design, elementos: (design.elementos || []).map(x => x.id === el.id ? { ...x, posicao: { ...x.posicao, y: v[0] } } : x) })} min={0} max={100} step={1} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </TabsContent>
