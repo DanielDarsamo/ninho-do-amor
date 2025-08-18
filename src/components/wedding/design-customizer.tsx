@@ -295,14 +295,14 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
         </CardHeader>
         <CardContent className="space-y-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-7">
-              <TabsTrigger value="cores">Cores</TabsTrigger>
-              <TabsTrigger value="fundo">Fundo</TabsTrigger>
-              <TabsTrigger value="textos">Textos</TabsTrigger>
-              <TabsTrigger value="elementos">Elementos</TabsTrigger>
-              <TabsTrigger value="decoracoes">Decorações</TabsTrigger>
-              <TabsTrigger value="canvas">Canvas</TabsTrigger>
-              <TabsTrigger value="musica">Música</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-7 sm:grid-cols-7 overflow-x-auto whitespace-nowrap gap-2 scrollbar-none">
+              <TabsTrigger value="cores" className="min-w-max">Cores</TabsTrigger>
+              <TabsTrigger value="fundo" className="min-w-max">Fundo</TabsTrigger>
+              <TabsTrigger value="textos" className="min-w-max">Textos</TabsTrigger>
+              <TabsTrigger value="elementos" className="min-w-max">Elementos</TabsTrigger>
+              <TabsTrigger value="decoracoes" className="min-w-max">Decorações</TabsTrigger>
+              <TabsTrigger value="canvas" className="min-w-max">Canvas</TabsTrigger>
+              <TabsTrigger value="musica" className="min-w-max">Música</TabsTrigger>
             </TabsList>
 
             <TabsContent value="cores" className="space-y-6 mt-6">
@@ -1346,6 +1346,19 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
                         <div className="flex items-center space-x-2">
                           <Label className="text-xs">Y</Label>
                           <Slider value={[el.posicao.y]} onValueChange={(v) => onDesignChange({ ...design, elementos: (design.elementos || []).map(x => x.id === el.id ? { ...x, posicao: { ...x.posicao, y: v[0] } } : x) })} min={0} max={100} step={1} />
+                        </div>
+                        <div className="flex items-center justify-end">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => onDesignChange({
+                              ...design,
+                              elementos: (design.elementos || []).filter(x => x.id !== el.id)
+                            })}
+                            aria-label="Remover elemento"
+                          >
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
                         </div>
                       </div>
                     ))}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { CasalData, ConviteDesign, ElementoDesign, ElementoTexto, FonteTexto, CanvasSettings } from '@/types/wedding';
 import { Heart, Calendar, MapPin, Flower, Sparkles, Edit3, X, RotateCw, Palette, Type, Move, Star, Cross, Ribbon } from 'lucide-react';
@@ -10,6 +10,10 @@ import { Slider } from '@/components/ui/slider';
 import { Card, CardContent } from '@/components/ui/card';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { getFontFamily } from '@/data/fonts';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 interface InvitationPreviewProps {
   casal: Partial<CasalData>;
@@ -45,6 +49,9 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
   editMode = false
 }) => {
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const isMobile = useIsMobile();
+  const [dragging, setDragging] = useState<{ id: string; type: 'design' | 'text' } | null>(null);
   // Disable inline editing for core text (header, names, message) to avoid
   // conflicts with Basic Data. We still keep selection for decorative items.
   const [editingText, setEditingText] = useState<string | null>(null);
@@ -93,6 +100,30 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
   const handleElementClick = (elementId: string) => {
     if (!editMode) return;
     setSelectedElement(selectedElement === elementId ? null : elementId);
+  };
+  const updatePositionFromEvent = useCallback((clientX: number, clientY: number) => {
+    if (!dragging || !onDesignChange) return;
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const xPercent = ((clientX - rect.left) / rect.width) * 100;
+    const yPercent = ((clientY - rect.top) / rect.height) * 100;
+    if (dragging.type === 'design') {
+      const updated = elementos.map((el) => el.id === dragging.id ? { ...el, posicao: { x: Math.max(0, Math.min(100, xPercent)), y: Math.max(0, Math.min(100, yPercent)) } } : el);
+      onDesignChange({ ...design, elementos: updated });
+    } else {
+      const updated = elementosTexto.map((el) => el.id === dragging.id ? { ...el, posicao: { x: Math.max(0, Math.min(100, xPercent)), y: Math.max(0, Math.min(100, yPercent)) } } : el);
+      onDesignChange({ ...design, elementosTexto: updated });
+    }
+  }, [dragging, onDesignChange, design, elementos, elementosTexto]);
+
+  const handlePointerMove: React.PointerEventHandler<HTMLDivElement> = (e) => {
+    if (!dragging) return;
+    e.preventDefault();
+    updatePositionFromEvent(e.clientX, e.clientY);
+  };
+
+  const handlePointerUp: React.PointerEventHandler<HTMLDivElement> = () => {
+    setDragging(null);
   };
 
   const handleTextClick = (elementId: string) => {
@@ -150,6 +181,11 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
           color: elemento.cor
         }}
         onClick={() => handleElementClick(elemento.id)}
+        onPointerDown={(e) => {
+          if (!editMode) return;
+          e.currentTarget.setPointerCapture(e.pointerId);
+          setDragging({ id: elemento.id, type: 'design' });
+        }}
       >
         <IconComponent 
           size={elemento.tamanho} 
@@ -233,6 +269,11 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
           ...fontStyle
         }}
         onClick={() => handleTextClick(elemento.id)}
+        onPointerDown={(e) => {
+          if (!editMode) return;
+          e.currentTarget.setPointerCapture(e.pointerId);
+          setDragging({ id: elemento.id, type: 'text' });
+        }}
       >
         {isEditing ? (
           <Textarea
@@ -328,11 +369,15 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
 
   return (
     <div className="relative">
-      <div className={cn(
+      <div
+        ref={containerRef}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        className={cn(
         "relative mx-auto rounded-lg shadow-invitation overflow-hidden",
         className
       )}
-      style={getCanvasStyle()}
+      style={{ ...getCanvasStyle(), touchAction: editMode ? 'none' : undefined }}
       >
         {/* Background Overlay */}
         {fundoImagem && (
@@ -589,12 +634,71 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
 
       {/* Edit Mode Controls */}
       {editMode && selectedElement && (
-        <Card className="absolute top-0 right-0 w-80 z-10">
-          <CardContent className="p-4">
-            <h3 className="font-medium mb-3">Editar Elemento</h3>
-            {/* Element editing controls will be added here */}
-          </CardContent>
-        </Card>
+        isMobile ? (
+          <Sheet open onOpenChange={() => setSelectedElement(null)}>
+            <SheetContent side="bottom" className="w-full max-w-full">
+              <SheetHeader>
+                <SheetTitle>Editar Elemento</SheetTitle>
+              </SheetHeader>
+              <div className="space-y-4 mt-2">
+                {(() => {
+                  const designEl = elementos.find(e => e.id === selectedElement);
+                  const textEl = elementosTexto.find(e => e.id === selectedElement);
+                  if (designEl) {
+                    return (
+                      <div className="space-y-3">
+                        <div className="flex items-center space-x-3">
+                          <Label className="w-24 text-xs">Cor</Label>
+                          <div className="w-6 h-6 rounded border border-border" style={{ backgroundColor: designEl.cor }} onClick={() => document.getElementById(`mobile-el-color-${designEl.id}`)?.click()} />
+                          <Input id={`mobile-el-color-${designEl.id}`} type="color" className="sr-only" value={designEl.cor} onChange={(e) => updateElementoDesign(designEl.id, { cor: e.target.value })} />
+                        </div>
+                        <div>
+                          <Label className="text-xs">Tamanho</Label>
+                          <Slider value={[designEl.tamanho]} onValueChange={(v) => updateElementoDesign(designEl.id, { tamanho: v[0] })} min={8} max={64} step={1} />
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Button size="sm" variant="outline" onClick={() => updateElementoDesign(designEl.id, { rotacao: (designEl.rotacao || 0) + 45 })}>
+                            <RotateCw className="w-3 h-3 mr-1" /> Girar
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => updateElementoDesign(designEl.id, { visivel: false })}>
+                            <X className="w-3 h-3 mr-1" /> Ocultar
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  }
+                  if (textEl) {
+                    return (
+                      <div className="space-y-3">
+                        <div className="flex items-center space-x-3">
+                          <Label className="w-24 text-xs">Cor</Label>
+                          <div className="w-6 h-6 rounded border border-border" style={{ backgroundColor: textEl.fonte.cor }} onClick={() => document.getElementById(`mobile-text-color-${textEl.id}`)?.click()} />
+                          <Input id={`mobile-text-color-${textEl.id}`} type="color" className="sr-only" value={textEl.fonte.cor} onChange={(e) => updateElementoTexto(textEl.id, { fonte: { ...textEl.fonte, cor: e.target.value } })} />
+                        </div>
+                        <div>
+                          <Label className="text-xs">Tamanho do Texto</Label>
+                          <Slider value={[textEl.fonte.tamanho]} onValueChange={(v) => updateElementoTexto(textEl.id, { fonte: { ...textEl.fonte, tamanho: v[0] } })} min={10} max={64} step={1} />
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Switch checked={textEl.visivel} onCheckedChange={(checked) => updateElementoTexto(textEl.id, { visivel: checked })} />
+                          <Label className="text-xs">Visível</Label>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+              </div>
+            </SheetContent>
+          </Sheet>
+        ) : (
+          <Card className="absolute top-0 right-0 w-80 z-10">
+            <CardContent className="p-4">
+              <h3 className="font-medium mb-3">Editar Elemento</h3>
+              {/* Placeholder for desktop side panel controls (future extension) */}
+            </CardContent>
+          </Card>
+        )
       )}
     </div>
   );
