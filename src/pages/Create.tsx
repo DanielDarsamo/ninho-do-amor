@@ -1,16 +1,21 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ProgressSteps } from '@/components/ui/progress-steps';
 import { CoupleForm } from '@/components/wedding/couple-form';
 import { InvitationPreview } from '@/components/wedding/invitation-preview';
 import { DesignCustomizer } from '@/components/wedding/design-customizer';
 import { CasalData, ConviteDesign } from '@/types/wedding';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import * as htmlToImage from 'html-to-image';
+import jsPDF from 'jspdf';
+import { useToast } from '@/hooks/use-toast';
 
 const Create = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
+  const { toast } = useToast();
   const [casalData, setCasalData] = useState<Partial<CasalData>>({});
   const [designData, setDesignData] = useState<Partial<ConviteDesign>>({
     corPrimaria: 'hsl(142, 35%, 45%)',
@@ -24,6 +29,7 @@ const Create = () => {
   });
 
   const steps = ['Dados Básicos', 'Personalização', 'Finalização'];
+  const finalPreviewRef = useRef<HTMLDivElement | null>(null);
 
   const handleDataChange = (newData: Partial<CasalData>) => {
     setCasalData(prev => ({ ...prev, ...newData }));
@@ -141,13 +147,63 @@ const Create = () => {
                   </div>
                 </div>
                 
-                <div className="space-x-4">
+                <div className="flex flex-wrap gap-3">
                   <Button variant="outline" onClick={handleBack}>
                     Voltar
                   </Button>
-                  <Button className="bg-gradient-primary">
-                    Criar Convite
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button className="bg-gradient-primary min-h-[48px] min-w-[48px]">
+                        <Download className="w-4 h-4 mr-2" />
+                        Baixar Convite
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56">
+                      <DropdownMenuItem onClick={async () => {
+                        if (!finalPreviewRef.current) return;
+                        toast({ title: 'Gerando JPEG...', description: 'Preparando download' });
+                        const dataUrl = await htmlToImage.toJpeg(finalPreviewRef.current, { quality: 0.95, pixelRatio: 2 });
+                        const link = document.createElement('a');
+                        link.download = 'convite.jpg';
+                        link.href = dataUrl;
+                        link.click();
+                        toast({ title: 'Download completo!', description: 'JPEG salvo.' });
+                      }}>JPEG (celular / social)</DropdownMenuItem>
+                      <DropdownMenuItem onClick={async () => {
+                        if (!finalPreviewRef.current) return;
+                        toast({ title: 'Gerando PNG...', description: 'Preparando download' });
+                        const dataUrl = await htmlToImage.toPng(finalPreviewRef.current, { pixelRatio: 2, cacheBust: true, backgroundColor: '#ffffff' });
+                        const link = document.createElement('a');
+                        link.download = 'convite.png';
+                        link.href = dataUrl;
+                        link.click();
+                        toast({ title: 'Download completo!', description: 'PNG salvo.' });
+                      }}>PNG (qualidade alta)</DropdownMenuItem>
+                      <DropdownMenuItem onClick={async () => {
+                        if (!finalPreviewRef.current) return;
+                        toast({ title: 'Gerando PDF...', description: 'Preparando download' });
+                        const dataUrl = await htmlToImage.toPng(finalPreviewRef.current, { pixelRatio: 3, cacheBust: true, backgroundColor: '#ffffff' });
+                        const img = new Image();
+                        img.src = dataUrl;
+                        img.onload = () => {
+                          // Create PDF in portrait A4 and fit the image preserving aspect ratio
+                          const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+                          const pageWidth = pdf.internal.pageSize.getWidth();
+                          const pageHeight = pdf.internal.pageSize.getHeight();
+                          const imgWidth = img.width;
+                          const imgHeight = img.height;
+                          const scale = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+                          const renderWidth = imgWidth * scale;
+                          const renderHeight = imgHeight * scale;
+                          const offsetX = (pageWidth - renderWidth) / 2;
+                          const offsetY = (pageHeight - renderHeight) / 2;
+                          pdf.addImage(img, 'PNG', offsetX, offsetY, renderWidth, renderHeight);
+                          pdf.save('convite.pdf');
+                          toast({ title: 'Download completo!', description: 'PDF salvo.' });
+                        };
+                      }}>PDF (impressão)</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
 
@@ -159,7 +215,9 @@ const Create = () => {
                     Versão final do seu convite
                   </p>
                 </div>
-                <InvitationPreview casal={casalData} design={designData} />
+                <div ref={finalPreviewRef} className="bg-white p-4 rounded-lg inline-block">
+                  <InvitationPreview casal={casalData} design={designData} />
+                </div>
               </div>
             </div>
           )}
