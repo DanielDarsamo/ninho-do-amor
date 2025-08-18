@@ -77,7 +77,8 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
     estiloRodape,
     tituloConviteTexto,
     tituloConviteCor,
-    decoracaoCabecalho
+    decoracaoCabecalho,
+    decoracaoCentral
   } = design;
 
   const formatDate = (date?: Date) => {
@@ -464,18 +465,59 @@ export const InvitationPreview: React.FC<InvitationPreviewProps> = ({
             </h1>
           </div>
 
-          {/* Decorative Element */}
-          <div className="flex items-center justify-center space-x-4 py-4">
-            <div 
-              className="w-16 h-0.5 opacity-30"
-              style={{ backgroundColor: corPrimaria }}
-            />
-            <Heart className="w-6 h-6 text-primary fill-current" />
-            <div 
-              className="w-16 h-0.5 opacity-30"
-              style={{ backgroundColor: corPrimaria }}
-            />
-          </div>
+          {/* Middle Decoration (unified with side decorations) */}
+          {decoracaoCentral?.habilitado !== false && (
+            <div
+              className="flex items-center justify-center py-4"
+              style={{
+                gap: '16px',
+                transform: `translate(${decoracaoCentral?.deslocamentoX || 0}px, ${decoracaoCentral?.deslocamentoY || 0}px)`
+              }}
+            >
+              {/* Left line */}
+              {decoracaoCentral?.linhasVisiveis !== false && (
+                <div
+                  className="h-0.5 opacity-30"
+                  style={{
+                    width:
+                      (decoracaoCentral?.linhasComprimento || 'medio') === 'curto' ? '2rem' :
+                      (decoracaoCentral?.linhasComprimento || 'medio') === 'longo' ? '5rem' : '4rem',
+                    backgroundColor: (decoracaoCentral?.sincronizarComLaterais ?? true)
+                      ? (decoracaoCabecalho?.cor || corPrimaria)
+                      : (decoracaoCentral?.cor || decoracaoCabecalho?.cor || corPrimaria)
+                  }}
+                />
+              )}
+
+              {/* Middle icon */}
+              {(() => {
+                const synced = decoracaoCentral?.sincronizarComLaterais ?? true;
+                const tipo = synced ? (decoracaoCabecalho?.tipo || 'coracao') : (decoracaoCentral?.tipo || 'coracao');
+                const Icon = tipo === 'coracao' ? Heart : tipo === 'estrela' ? Star : tipo === 'flor' ? Flower : tipo === 'cruz' ? Cross : Ribbon;
+                const cor = synced ? (decoracaoCabecalho?.cor || corPrimaria) : (decoracaoCentral?.cor || decoracaoCabecalho?.cor || corPrimaria);
+                const tamanhoBase = synced ? (decoracaoCabecalho?.tamanho || 20) : (decoracaoCentral?.tamanho || 24);
+                const tamanho = Math.round(tamanhoBase * 1.1); // slightly larger by default
+                return (
+                  <Icon className="fill-current" style={{ color: cor }} size={tamanho} />
+                );
+              })()}
+
+              {/* Right line */}
+              {decoracaoCentral?.linhasVisiveis !== false && (
+                <div
+                  className="h-0.5 opacity-30"
+                  style={{
+                    width:
+                      (decoracaoCentral?.linhasComprimento || 'medio') === 'curto' ? '2rem' :
+                      (decoracaoCentral?.linhasComprimento || 'medio') === 'longo' ? '5rem' : '4rem',
+                    backgroundColor: (decoracaoCentral?.sincronizarComLaterais ?? true)
+                      ? (decoracaoCabecalho?.cor || corPrimaria)
+                      : (decoracaoCentral?.cor || decoracaoCabecalho?.cor || corPrimaria)
+                  }}
+                />
+              )}
+            </div>
+          )}
 
           {/* Event Details */}
           <div className="space-y-4">

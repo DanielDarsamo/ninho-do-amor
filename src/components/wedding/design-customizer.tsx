@@ -669,6 +669,267 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
                   </Button>
                 </div>
               </div>
+
+              {/* Middle Decoration */}
+              <div className="border rounded-lg p-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-medium">Decoração Central</Label>
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2">
+                      <Label className="text-xs">Mostrar</Label>
+                      <Switch
+                        checked={design.decoracaoCentral?.habilitado ?? true}
+                        onCheckedChange={(checked) => onDesignChange({
+                          ...design,
+                          decoracaoCentral: {
+                            habilitado: checked,
+                            sincronizarComLaterais: design.decoracaoCentral?.sincronizarComLaterais ?? true,
+                            tipo: design.decoracaoCentral?.tipo,
+                            cor: design.decoracaoCentral?.cor,
+                            tamanho: design.decoracaoCentral?.tamanho,
+                            linhasVisiveis: design.decoracaoCentral?.linhasVisiveis ?? true,
+                            linhasComprimento: design.decoracaoCentral?.linhasComprimento || 'medio',
+                            deslocamentoX: design.decoracaoCentral?.deslocamentoX || 0,
+                            deslocamentoY: design.decoracaoCentral?.deslocamentoY || 0,
+                          }
+                        })}
+                      />
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Label className="text-xs">Sincronizar com laterais</Label>
+                      <Switch
+                        checked={design.decoracaoCentral?.sincronizarComLaterais ?? true}
+                        onCheckedChange={(checked) => onDesignChange({
+                          ...design,
+                          decoracaoCentral: {
+                            habilitado: design.decoracaoCentral?.habilitado ?? true,
+                            sincronizarComLaterais: checked,
+                            tipo: design.decoracaoCentral?.tipo,
+                            cor: design.decoracaoCentral?.cor,
+                            tamanho: design.decoracaoCentral?.tamanho,
+                            linhasVisiveis: design.decoracaoCentral?.linhasVisiveis ?? true,
+                            linhasComprimento: design.decoracaoCentral?.linhasComprimento || 'medio',
+                            deslocamentoX: design.decoracaoCentral?.deslocamentoX || 0,
+                            deslocamentoY: design.decoracaoCentral?.deslocamentoY || 0,
+                          }
+                        })}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Independent controls when not synced */}
+                {!(design.decoracaoCentral?.sincronizarComLaterais ?? true) && (
+                  <>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {[
+                        { value: 'coracao', label: 'Coração', icon: Heart },
+                        { value: 'estrela', label: 'Estrela', icon: Star },
+                        { value: 'flor', label: 'Flor', icon: Flower },
+                        { value: 'cruz', label: 'Cruz', icon: Cross },
+                        { value: 'lacinho', label: 'Lacinho', icon: Ribbon },
+                      ].map((opt) => (
+                        <Button
+                          key={opt.value}
+                          type="button"
+                          variant={(design.decoracaoCentral?.tipo || 'coracao') === (opt.value as any) ? 'default' : 'outline'}
+                          onClick={() => onDesignChange({
+                            ...design,
+                            decoracaoCentral: {
+                              ...(design.decoracaoCentral || {
+                                habilitado: true,
+                                sincronizarComLaterais: false,
+                                linhasVisiveis: true,
+                                linhasComprimento: 'medio',
+                                deslocamentoX: 0,
+                                deslocamentoY: 0,
+                              }),
+                              tipo: opt.value as any,
+                            }
+                          })}
+                          className="h-16 flex-col"
+                        >
+                          <opt.icon className="w-5 h-5" />
+                          <span className="text-xs">{opt.label}</span>
+                        </Button>
+                      ))}
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex items-center space-x-3">
+                        <Label className="w-24 text-xs">Cor</Label>
+                        <div
+                          className="w-8 h-8 rounded border border-border cursor-pointer"
+                          style={{ backgroundColor: design.decoracaoCentral?.cor || design.corPrimaria || '#4B9B68' }}
+                          onClick={() => document.getElementById('decoracao-central-cor')?.click()}
+                        />
+                        <Input
+                          id="decoracao-central-cor"
+                          type="color"
+                          value={(design.decoracaoCentral?.cor || design.corPrimaria || '#4B9B68') as string}
+                          onChange={(e) => onDesignChange({
+                            ...design,
+                            decoracaoCentral: {
+                              ...(design.decoracaoCentral || {
+                                habilitado: true,
+                                sincronizarComLaterais: false,
+                                linhasVisiveis: true,
+                                linhasComprimento: 'medio',
+                                deslocamentoX: 0,
+                                deslocamentoY: 0,
+                              }),
+                              cor: e.target.value,
+                            }
+                          })}
+                          className="sr-only"
+                        />
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <Label className="w-24 text-xs">Tamanho</Label>
+                        <Select
+                          value={String(design.decoracaoCentral?.tamanho || '24')}
+                          onValueChange={(v) => onDesignChange({
+                            ...design,
+                            decoracaoCentral: {
+                              ...(design.decoracaoCentral || {
+                                habilitado: true,
+                                sincronizarComLaterais: false,
+                                linhasVisiveis: true,
+                                linhasComprimento: 'medio',
+                                deslocamentoX: 0,
+                                deslocamentoY: 0,
+                              }),
+                              tamanho: parseInt(v),
+                            }
+                          })}
+                        >
+                          <SelectTrigger className="text-xs"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="18">Pequeno</SelectItem>
+                            <SelectItem value="24">Médio</SelectItem>
+                            <SelectItem value="32">Grande</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <Label className="w-24 text-xs">Linhas</Label>
+                        <Switch
+                          checked={design.decoracaoCentral?.linhasVisiveis ?? true}
+                          onCheckedChange={(checked) => onDesignChange({
+                            ...design,
+                            decoracaoCentral: {
+                              ...(design.decoracaoCentral || {
+                                habilitado: true,
+                                sincronizarComLaterais: false,
+                                linhasComprimento: 'medio',
+                                deslocamentoX: 0,
+                                deslocamentoY: 0,
+                              }),
+                              linhasVisiveis: checked,
+                            }
+                          })}
+                        />
+                        <Select
+                          value={design.decoracaoCentral?.linhasComprimento || 'medio'}
+                          onValueChange={(v) => onDesignChange({
+                            ...design,
+                            decoracaoCentral: {
+                              ...(design.decoracaoCentral || {
+                                habilitado: true,
+                                sincronizarComLaterais: false,
+                                linhasVisiveis: true,
+                                deslocamentoX: 0,
+                                deslocamentoY: 0,
+                              }),
+                              linhasComprimento: v as any,
+                            }
+                          })}
+                        >
+                          <SelectTrigger className="text-xs"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="curto">Curto</SelectItem>
+                            <SelectItem value="medio">Médio</SelectItem>
+                            <SelectItem value="longo">Longo</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <Label className="w-24 text-xs">Posição X</Label>
+                        <Slider
+                          value={[design.decoracaoCentral?.deslocamentoX || 0]}
+                          onValueChange={(v) => onDesignChange({
+                            ...design,
+                            decoracaoCentral: {
+                              ...(design.decoracaoCentral || {
+                                habilitado: true,
+                                sincronizarComLaterais: false,
+                                linhasVisiveis: true,
+                                linhasComprimento: 'medio',
+                                deslocamentoY: 0,
+                              }),
+                              deslocamentoX: v[0],
+                            }
+                          })}
+                          min={-50}
+                          max={50}
+                          step={1}
+                          className="flex-1"
+                        />
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <Label className="w-24 text-xs">Posição Y</Label>
+                        <Slider
+                          value={[design.decoracaoCentral?.deslocamentoY || 0]}
+                          onValueChange={(v) => onDesignChange({
+                            ...design,
+                            decoracaoCentral: {
+                              ...(design.decoracaoCentral || {
+                                habilitado: true,
+                                sincronizarComLaterais: false,
+                                linhasVisiveis: true,
+                                linhasComprimento: 'medio',
+                                deslocamentoX: 0,
+                              }),
+                              deslocamentoY: v[0],
+                            }
+                          })}
+                          min={-30}
+                          max={30}
+                          step={1}
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onDesignChange({
+                          ...design,
+                          decoracaoCentral: {
+                            habilitado: true,
+                            sincronizarComLaterais: true,
+                            tipo: undefined,
+                            cor: undefined,
+                            tamanho: undefined,
+                            linhasVisiveis: true,
+                            linhasComprimento: 'medio',
+                            deslocamentoX: 0,
+                            deslocamentoY: 0,
+                          }
+                        })}
+                      >
+                        Resetar
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
             </TabsContent>
 
             <TabsContent value="textos" className="space-y-6 mt-6">

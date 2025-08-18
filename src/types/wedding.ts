@@ -81,6 +81,8 @@ export interface ConviteDesign {
   backgroundIndex?: number;
   // Header decorations (icons flanking title)
   decoracaoCabecalho?: HeaderDecoration;
+  // Middle decoration (between lines below the header)
+  decoracaoCentral?: MiddleDecoration;
 }
 
 export interface ElementoDesign {
@@ -102,6 +104,19 @@ export interface HeaderDecoration {
   tamanho: number; // px
   espacamento: number; // gap between icon and title, px
   deslocamentoX: number; // nudge entire decoration/title row horizontally, px
+}
+
+export interface MiddleDecoration {
+  habilitado: boolean;
+  sincronizarComLaterais: boolean; // when true, inherit from HeaderDecoration
+  tipo?: 'coracao' | 'estrela' | 'flor' | 'cruz' | 'lacinho';
+  cor?: string;
+  tamanho?: number; // px
+  // Lines flanking the middle icon
+  linhasVisiveis: boolean;
+  linhasComprimento: 'curto' | 'medio' | 'longo';
+  deslocamentoX: number; // px
+  deslocamentoY: number; // px
 }
 
 export interface RSVP {
