@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Heart, Sparkles, Share2, Calendar, MapPin, Music } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import heroImage from '@/assets/hero-wedding.jpg';
+import { ExamplesGallery } from '@/components/examples-gallery';
 
 const Index = () => {
   const navigate = useNavigate();
+  const [showExamples, setShowExamples] = useState(false);
 
   const features = [
     {
@@ -98,6 +100,7 @@ const Index = () => {
                 <Button 
                   size="lg"
                   variant="outline"
+                  onClick={() => setShowExamples(true)}
                   className="text-lg px-8 py-3 border-primary/30 hover:bg-primary/5"
                 >
                   Ver Exemplos
@@ -230,6 +233,12 @@ const Index = () => {
           </div>
         </div>
       </footer>
+      
+      {/* Examples Gallery Modal */}
+      <ExamplesGallery 
+        open={showExamples} 
+        onOpenChange={setShowExamples}
+      />
     </div>
   );
 };

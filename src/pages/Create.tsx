@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { ProgressSteps } from '@/components/ui/progress-steps';
 import { CoupleForm } from '@/components/wedding/couple-form';
 import { InvitationPreview } from '@/components/wedding/invitation-preview';
@@ -6,7 +6,7 @@ import { DesignCustomizer } from '@/components/wedding/design-customizer';
 import { CasalData, ConviteDesign } from '@/types/wedding';
 import { ArrowLeft, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import * as htmlToImage from 'html-to-image';
 import jsPDF from 'jspdf';
@@ -14,8 +14,9 @@ import { useToast } from '@/hooks/use-toast';
 
 const Create = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(0);
+  const location = useLocation();
   const { toast } = useToast();
+  const [currentStep, setCurrentStep] = useState(0);
   const [casalData, setCasalData] = useState<Partial<CasalData>>({});
   const [designData, setDesignData] = useState<Partial<ConviteDesign>>({
     corPrimaria: 'hsl(142, 35%, 45%)',
@@ -27,6 +28,17 @@ const Create = () => {
     elementos: [],
     elementosTexto: []
   });
+
+  // Handle example data from gallery
+  useEffect(() => {
+    if (location.state?.exampleData) {
+      const { casal, design } = location.state.exampleData;
+      setCasalData(casal || {});
+      setDesignData(prev => ({ ...prev, ...design }));
+      // Clear the state to prevent re-applying on refresh
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.state, navigate, location.pathname]);
 
   const steps = ['Dados Básicos', 'Personalização', 'Finalização'];
   const finalPreviewRef = useRef<HTMLDivElement | null>(null);
