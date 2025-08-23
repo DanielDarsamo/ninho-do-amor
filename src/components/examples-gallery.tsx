@@ -58,23 +58,14 @@ export const ExamplesGallery: React.FC<ExamplesGalleryProps> = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
-        <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-2xl font-heading text-primary">
-              Exemplos de Convites
-            </DialogTitle>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onOpenChange(false)}
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
-          <p className="text-muted-foreground">
-            Explore diferentes estilos e inspire-se para criar seu convite perfeito
-          </p>
-        </DialogHeader>
+                 <DialogHeader>
+           <DialogTitle className="text-2xl font-heading text-primary">
+             Exemplos de Convites
+           </DialogTitle>
+           <p className="text-muted-foreground">
+             Explore diferentes estilos e inspire-se para criar seu convite perfeito
+           </p>
+         </DialogHeader>
 
         <div className="flex flex-col h-full">
           {/* Category Tabs */}
@@ -163,22 +154,22 @@ export const ExamplesGallery: React.FC<ExamplesGalleryProps> = ({
           </Tabs>
         </div>
 
-        {/* Detail Modal */}
-        {selectedExample && (
-          <Dialog open={!!selectedExample} onOpenChange={() => setSelectedExample(null)}>
-            <DialogContent className="max-w-4xl">
-              <DialogHeader>
-                <DialogTitle className="flex items-center justify-between">
-                  <span>{selectedExample.name}</span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setSelectedExample(null)}
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </DialogTitle>
-              </DialogHeader>
+                 {/* Detail View */}
+         {selectedExample && (
+           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]" onClick={() => setSelectedExample(null)}>
+             <div className="bg-background rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+               <div className="flex items-center justify-between mb-4">
+                 <h2 className="text-xl font-heading text-primary">
+                   {selectedExample.name}
+                 </h2>
+                 <Button
+                   variant="ghost"
+                   size="icon"
+                   onClick={() => setSelectedExample(null)}
+                 >
+                   <X className="w-4 h-4" />
+                 </Button>
+               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Preview */}
@@ -208,7 +199,7 @@ export const ExamplesGallery: React.FC<ExamplesGalleryProps> = ({
                         <span className="font-medium">Local:</span> {selectedExample.casal.cidade}, {selectedExample.casal.provincia}
                       </div>
                       <div>
-                        <span className="font-medium">Mensagem:</span> "{selectedExample.mensagemPersonalizada}"
+                        <span className="font-medium">Mensagem:</span> "{selectedExample.design.mensagemPersonalizada}"
                       </div>
                     </div>
                   </div>
@@ -236,8 +227,8 @@ export const ExamplesGallery: React.FC<ExamplesGalleryProps> = ({
                   </div>
                 </div>
               </div>
-            </DialogContent>
-          </Dialog>
+            </div>
+          </div>
         )}
       </DialogContent>
     </Dialog>
